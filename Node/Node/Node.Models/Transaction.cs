@@ -31,7 +31,7 @@ namespace Node.Models
         public DateTime DateCreated { get; private set; }
         public string SenderPublicKey { get; private set; }
         public string[] Signature { get; private set; }
-        public string TransactionHash { get; private set; }
+        public string Hash { get; private set; }
 
         public int MinedInIndex { get; private set; }
         public bool TranserSuccessful { get; private set; }
@@ -45,16 +45,20 @@ namespace Node.Models
             DateCreated = creation;
             SenderPublicKey = senderPyblicKey;
             Signature = signature;
-            TransactionHash = hash;
+            Hash = hash;
+        }
+
+        public Transaction(string from, string to, decimal amount, DateTime creation, string senderPyblicKey,
+            string[] signature) : this(from, to,amount,creation,senderPyblicKey,signature, null)
+        {
+            Hash = CalculateHash();
         }
 
         public void Validate()
         {
-            TransactionHash hashObject = new TransactionHash(From, To, Amount, DateCreated, SenderPublicKey, Signature);
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(hashObject);
-            string hash = Crypto.Sha256(json);
+            string hash = CalculateHash();
 
-            if (hash != TransactionHash)
+            if (hash != Hash)
                 throw new TransactionNotValidException("Transaction not Valid! Tranascion is chnaged by middle man");
         }
 
@@ -64,6 +68,16 @@ namespace Node.Models
                 throw new TransactionNotValidException("Sender signature is not valid");
 
             return true;
+        }
+
+        private string CalculateHash()
+        {
+            TransactionHash hashObject = new TransactionHash(From, To, Amount, DateCreated, SenderPublicKey, Signature);
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(hashObject);
+            string hash = Crypto.Sha256(json);
+
+            return hash;
+
         }
     }
 }

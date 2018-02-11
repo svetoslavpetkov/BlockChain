@@ -26,6 +26,9 @@ namespace Node.Models
             MiningJobs = new Dictionary<string, Block>();
             Peers = new List<Peer>();
             Balances = new List<Balance>();
+
+            Block genesisBlock = Block.CreateGenesisBlock();
+            BlockChain.Add(genesisBlock);
         }
 
         public void AddTransaction(TransactionApiModel transaction)
@@ -43,6 +46,12 @@ namespace Node.Models
         private void BroadcastToPeers(Transaction tx)
         {
             //TODO
+        }
+
+        public MiningContext StartMining(string minerAddress)
+        {
+            MiningContext context = new MiningContext();
+            return context;
         }
     }
 }
