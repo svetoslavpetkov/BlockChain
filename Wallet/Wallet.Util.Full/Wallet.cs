@@ -1,6 +1,5 @@
 ﻿using HBitcoin.KeyManagement;
 using NBitcoin;
-using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -12,10 +11,8 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using System;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-
-namespace Wallet.Util
+namespace Wallet.Util.Full
 {
     public class Wallet
     {
@@ -40,45 +37,9 @@ namespace Wallet.Util
 
         public string NodeAddress { get; set; }
 
-        public Transaction Sign(string senderAddress, string receiverAddress, decimal value)
+        public Transaction Sign(string senderAddress, string receiverAddress, int value)
         {
-            TransactionRaw rawTransaction = new TransactionRaw()
-            {
-                FromAddress = senderAddress,
-                ToAddress = receiverAddress,
-                Amount = value, DateCreated = DateTime.Now
-            };
-
-
-            string serialized = JsonConvert.SerializeObject(rawTransaction);
-            string hash = Sha256(serialized);
-
-
-            return new Transaction() {
-                FromAddress = senderAddress,
-                ToAddress = receiverAddress,
-                Amount = value,
-                DateCreated = DateTime.Now,
-                SenderPublicKey = "aadfasdfsads",
-                TransactionHash = hash,
-                Signature = new string[] { "abc", "efd" }
-            };
-        }
-
-
-        public static String Sha256(String value)
-        {
-            StringBuilder hashResult = new StringBuilder();
-
-            using (SHA256 hash = SHA256Managed.Create())
-            {
-                Byte[] result = hash.ComputeHash(Encoding.UTF8.GetBytes(value));
-
-                foreach (Byte b in result)
-                    hashResult.Append(b.ToString("x2"));
-            }
-
-            return hashResult.ToString();
+            throw new NotImplementedException();
         }
 
 
@@ -107,7 +68,7 @@ namespace Wallet.Util
         public string GetPublicKeyCompressed(string privateKeyString)
         {
             BigInteger privateKey = new BigInteger(privateKeyString, 10);
-            Org.BouncyCastle.Math.EC.ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
+            ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
 
             string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
             return pubKeyCompressed;
@@ -135,7 +96,7 @@ namespace Wallet.Util
             return string.Concat(bytes.Select(b => b.ToString("x2")));
         }
 
-        public static string EncodeECPointHexCompressed(Org.BouncyCastle.Math.EC.ECPoint point)
+        public static string EncodeECPointHexCompressed(ECPoint point)
         {
             BigInteger x = point.XCoord.ToBigInteger();
             return x.ToString(16) + Convert.ToInt32(!x.TestBit(0));
@@ -153,13 +114,12 @@ namespace Wallet.Util
 
         static readonly X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
 
-        public static Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
+        public static ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
         {
-            Org.BouncyCastle.Math.EC.ECPoint pubKey = curve.G.Multiply(privKey).Normalize();
+            ECPoint pubKey = curve.G.Multiply(privKey).Normalize();
             return pubKey;
         }
 
         #endregion
     }
-
 }
