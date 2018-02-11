@@ -3,3 +3,8 @@
 ################################################################################
 
 /Node/Node/.vs/Node/v15
+/.vs
+/Node/Node/Node/bin/Debug/netcoreapp2.0
+/Node/Node/Node/obj
+/Node/Node/Node.Models/obj
+/Node/Node/Node.Models/bin/Debug/netcoreapp2.0
