@@ -8,9 +8,9 @@ namespace Node.Models
     {
         public string SenderAddress { get; private set; }
         public string ReceiverAddress { get; private set; }
-        public decimal Amount { get; set; }
-        public DateTime DateCreated { get; set; }
-        public string SenderPublicKey { get; set; }
+        public decimal Amount { get; private set; }
+        public DateTime DateCreated { get; private set; }
+        public string SenderPublicKey { get; private set; }
         public string[] Signature { get; private set; }
         public string TransactionHash { get; private set; }
 
