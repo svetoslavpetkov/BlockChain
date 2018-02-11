@@ -269,3 +269,5 @@ __pycache__/
 /Node/Node/Node/obj
 /Node/Node/Node.Models/obj
 /Node/Node/Node.Models/bin/Debug/netcoreapp2.0
+*.pyc
+/Wallet/Wallet.UI/Wallets

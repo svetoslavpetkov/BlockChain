@@ -1,31 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Wallet.Util
+namespace Wallet.Util.Full
 {
-    public class TransactionRaw
+    public class Transaction
     {
         public string FromAddress { get; set; }
         public string ToAddress { get; set; }
 
-        public decimal Amount { get; set; }
+        public decimal Value { get; set; }
         public DateTime DateCreated { get; set; }
 
-    }
-
-
-    public class SignedTransaction: TransactionRaw
-    {
         public string SenderPublicKey { get; set; }
 
         public string[] Signature { get; set; }
-    }
 
-
-   
-    public class Transaction: SignedTransaction
-    {
         public string TransactionHash { get; set; }
     }
-
 }
