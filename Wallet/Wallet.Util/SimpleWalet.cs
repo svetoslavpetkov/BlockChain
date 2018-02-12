@@ -22,24 +22,27 @@ namespace Wallet.Util.Core
 
 
         public string PrivateKey { get; set; }
+        public int PrivateKeyRadix { get; set; }
+
         public string PublicKey { get; set; }
 
         public Org.BouncyCastle.Math.EC.ECPoint PublicKeyPoint { get; set; }
 
 
-        public SimpleWalet(string privateKey)
+        public SimpleWalet(string privateKey, int radix)
         {
             PrivateKey = privateKey;
+            PrivateKeyRadix = radix;
+
             PublicKey = GetPublicKeyCompressed(privateKey);
 
-            PublicKeyPoint = GetPublicKeyFromPrivateKey(new BigInteger(PrivateKey, 10));
+            PublicKeyPoint = GetPublicKeyFromPrivateKey(new BigInteger(PrivateKey, radix));
         }
 
 
         public Transaction Sign(string recipientAddress, decimal value, DateTime signDate)
         {
-            BigInteger privateKey = new BigInteger(PrivateKey, 10);
-            BigInteger publicKey = new BigInteger(PublicKey, 16);
+            BigInteger privateKey = new BigInteger(PrivateKey, PrivateKeyRadix);           
             string senderAddress = CalcRipeMD160(PublicKey);
 
             TransactionRaw transactionRaw = new TransactionRaw()
@@ -73,7 +76,7 @@ namespace Wallet.Util.Core
             ECDomainParameters ecSpec = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
             IDsaKCalculator kCalculator = new HMacDsaKCalculator(new Sha256Digest());
 
-            BigInteger pubKey = new BigInteger(transaction.SenderPublicKey, 16);
+            //BigInteger pubKey = new BigInteger(transaction.SenderPublicKey, 16);
 
 
             //byte[] xEnc = X9IntegerConverter.IntegerToBytes(pubKey, X9IntegerConverter.GetByteLength(curve.Curve));
@@ -141,14 +144,14 @@ namespace Wallet.Util.Core
 
             string privateKeyString = privateKey.ToString(10);
 
-            return new SimpleWalet(privateKeyString);
+            return new SimpleWalet(privateKeyString,10);
         }
 
 
 
         public string GetPublicKeyCompressed(string privateKeyString)
         {
-            BigInteger privateKey = new BigInteger(privateKeyString, 10);
+            BigInteger privateKey = new BigInteger(privateKeyString, PrivateKeyRadix);
             Org.BouncyCastle.Math.EC.ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
 
             string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
@@ -184,16 +187,18 @@ namespace Wallet.Util.Core
             return x.ToString(16) + Convert.ToInt32(!x.TestBit(0));*/
 
             var compressedPoint = point.GetEncoded(true);
-            return Encoding.UTF8.GetString(compressedPoint);
+            BigInteger biInt = new BigInteger(compressedPoint);
+
+            return biInt.ToString(16);
         }
 
         public static Org.BouncyCastle.Math.EC.ECPoint DecodeECPointPublicKey(string input)
         {
-           // int p = 256, a = 0, b = 7;
+            // int p = 256, a = 0, b = 7;
             //bool isOdd = input[16] == '1';
             //BigInteger pointInt = new BigInteger()
-
-           byte[] compressedKey =  Encoding.UTF8.GetBytes(input);
+            BigInteger bigInt = new BigInteger(input, 16);
+           byte[] compressedKey = bigInt.ToByteArray();
 
             var point = curve.Curve.DecodePoint(compressedKey);
             return point;
