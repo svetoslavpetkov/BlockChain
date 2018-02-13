@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Node.Models
+namespace Node.Domain
 {
     internal class TransactionHash
     {

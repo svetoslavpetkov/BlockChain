@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Node.Models
+namespace Node.Domain
 {
     public class MiningContext
     {

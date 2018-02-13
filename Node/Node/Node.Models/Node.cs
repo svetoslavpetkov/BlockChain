@@ -1,9 +1,9 @@
-﻿using Node.Models.ViewModels;
+﻿using Node.Domain.ApiModels;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Node.Models
+namespace Node.Domain
 {
     public class Node
     {
@@ -17,7 +17,6 @@ namespace Node.Models
 
         //TODO
         public List<Peer> Peers { get; private set; }
-        public List<Balance> Balances { get; private set; }
 
         public Node()
         {
@@ -25,7 +24,6 @@ namespace Node.Models
             PendingTransactions = new ConcurrentBag<Transaction>();
             MiningJobs = new Dictionary<string, Block>();
             Peers = new List<Peer>();
-            Balances = new List<Balance>();
 
             Block genesisBlock = Block.CreateGenesisBlock();
             BlockChain.Add(genesisBlock);

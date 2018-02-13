@@ -1,9 +1,9 @@
-﻿using Node.Models.Exceptions;
+﻿using Node.Domain.Exceptions;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Node.Models
+namespace Node.Domain
 {
     public static class Crypto
     {

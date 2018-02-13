@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Node.Models
+namespace Node.Domain
 {
     public class Block
     {
