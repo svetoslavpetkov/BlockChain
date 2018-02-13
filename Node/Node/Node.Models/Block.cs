@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlockChain.Core;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,11 +24,13 @@ namespace Node.Domain
 
         public static Block CreateGenesisBlock()
         {
+            DateTime now = DateTime.Now;
             return new Block()
             {
                 Transactions = new List<Transaction>()
                 {
-                    new Transaction("from", "to",10000,DateTime.UtcNow, "PubKey", new string[2] { "x","y" })
+                    new Transaction() { ToAddress="a1",Amount=1000,DateCreated = now.AddDays(-10) },
+                    new Transaction() { ToAddress="a2",Amount=1000,DateCreated = now.AddDays(-10) },
                 },
                 CreatedDate = DateTime.UtcNow,
                 Difficulty = 1,
