@@ -47,6 +47,10 @@ namespace Node.Domain
             if(!isVerified)
                 throw new TransactionNotValidException("Transaction not Valid! Signutre is not valid");
 
+            string address = TranasctionValidator.GetAddress(transaction.SenderPublicKey);
+            if (address != transaction.FromAddress)
+                throw new TransactionNotValidException("Provided address is not valid.");
+
             PendingTransactions.Add(transaction);
             BroadcastToPeers(transaction);
         }

@@ -19,6 +19,21 @@ namespace BlockChain.Core
     public class CryptographyBase
     {
         protected readonly ICryptoUtil CryptoUtil = new CryptoUtil();
+
+        protected string CalcRipeMD160(string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            RipeMD160Digest digest = new RipeMD160Digest();
+            digest.BlockUpdate(bytes, 0, bytes.Length);
+            byte[] result = new byte[digest.GetDigestSize()];
+            digest.DoFinal(result, 0);
+            return BytesToHex(result);
+        }
+
+        private string BytesToHex(byte[] bytes)
+        {
+            return string.Concat(bytes.Select(b => b.ToString("x2")));
+        }
     }
 
     public interface ITransactionSigner
@@ -68,21 +83,6 @@ namespace BlockChain.Core
             return CalcRipeMD160(CryptoUtil.GetPublicKeyCompressed(privateKey));
         }
 
-        private string CalcRipeMD160(string text)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            RipeMD160Digest digest = new RipeMD160Digest();
-            digest.BlockUpdate(bytes, 0, bytes.Length);
-            byte[] result = new byte[digest.GetDigestSize()];
-            digest.DoFinal(result, 0);
-            return BytesToHex(result);
-        }
-
-        private string BytesToHex(byte[] bytes)
-        {
-            return string.Concat(bytes.Select(b => b.ToString("x2")));
-        }
-
         /// <summary>
         /// Calculates deterministic ECDSA signature (with HMAC-SHA256), based on secp256k1 and RFC-6979.
         /// </summary>
@@ -102,6 +102,7 @@ namespace BlockChain.Core
     {
         bool IsValid(Transaction transaction);
         bool IsValidateHash(Transaction transaction);
+        string GetAddress(string publicKey);
     }
 
     public class TransactionValidator : CryptographyBase, ITransactionValidator
@@ -147,6 +148,12 @@ namespace BlockChain.Core
             string txHash = CryptoUtil.CalcSHA256String(jsonTx);
 
             return transaction.TransactionHash != txHash;
+        }
+
+        public string GetAddress(string publicKey)
+        {
+            string address = CalcRipeMD160(publicKey);
+            return address;
         }
 
         private Org.BouncyCastle.Math.EC.ECPoint DecodeECPointPublicKey(string input)
