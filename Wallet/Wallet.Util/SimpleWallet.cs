@@ -1,16 +1,16 @@
 ﻿using BlockChain.Core;
 using System;
 
-namespace Wallet.Util.Core
+namespace Wallet.Util
 {
-    public class SimpleWalet
+    public class SimpleWallet
     {
         private ITransactionSigner Signer = new TransactionSigner();
         private ICryptoUtil CryptoUtil = new CryptoUtil();
 
         public string PrivateKey { get; set; }
 
-        public SimpleWalet(string privateKey)
+        public SimpleWallet(string privateKey)
         {
             PrivateKey = privateKey;
         }
@@ -23,11 +23,11 @@ namespace Wallet.Util.Core
             return signedTransaction;
         }
 
-        public static SimpleWalet GenerateNewWallet()
+        public static SimpleWallet GenerateNewWallet()
         {
-            string privateKeyString = new CryptoUtil().GetRandomPrivateKey(10); // must be 16?
+            string privateKeyString = new CryptoUtil().GetRandomPrivateKey(); // must be 16?
 
-            return new SimpleWalet(privateKeyString);
+            return new SimpleWallet(privateKeyString);
         }
 
         public string GetAddress()
@@ -35,7 +35,10 @@ namespace Wallet.Util.Core
             string address = Signer.CalculateAddress(PrivateKey);
             return address;
         }
-
-
+       
+        public string GetPublicKey()
+        {
+            return CryptoUtil.GetPublicKeyCompressed(PrivateKey);
+        }
     }
 }

@@ -11,22 +11,18 @@ using System.Linq;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Security;
+using System.Security.Cryptography;
 
 namespace BlockChain.Core
 {
-    public class CryptographyBase
-    {
-        protected readonly X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
 
-        protected byte[] CalcSHA256(string text)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            Sha256Digest digest = new Sha256Digest();
-            digest.BlockUpdate(bytes, 0, bytes.Length);
-            byte[] result = new byte[digest.GetDigestSize()];
-            digest.DoFinal(result, 0);
-            return result;
-        }
+    public class CryptographyBase 
+    {
+        protected readonly ICryptoUtil CryptoUtil = new CryptoUtil();
+
+
+
+
     }
 
     public interface ITransactionSigner
@@ -40,7 +36,7 @@ namespace BlockChain.Core
         public Transaction Sign(string privateKey, string recipientAddress, decimal amount, DateTime signDate)
         {
             BigInteger hexPrivateKey = new BigInteger(privateKey, 16);
-            string publicKey = GetPublicKeyCompressed(privateKey);
+            string publicKey = CryptoUtil.GetPublicKeyCompressed(privateKey);
             string senderAddress = CalcRipeMD160(publicKey);
 
             TransactionRaw transactionRaw = new TransactionRaw()
@@ -52,7 +48,7 @@ namespace BlockChain.Core
             };
 
             string tranJson = JsonConvert.SerializeObject(transactionRaw);
-            byte[] tranHash = CalcSHA256(tranJson);
+            byte[] tranHash = CryptoUtil.CalcSHA256(tranJson);
 
             BigInteger[] tranSignature = SignData(hexPrivateKey, tranHash);
             Transaction signedTransaction = new Transaction()
@@ -71,31 +67,10 @@ namespace BlockChain.Core
 
         public string CalculateAddress(string privateKey)
         {
-            return CalcRipeMD160(GetPublicKeyCompressed(privateKey));
+            return CalcRipeMD160(CryptoUtil.GetPublicKeyCompressed(privateKey));
         }
 
-        private string GetPublicKeyCompressed(string privateKeyString)
-        {
-            BigInteger privateKey = new BigInteger(privateKeyString, 16);
-            Org.BouncyCastle.Math.EC.ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
 
-            string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
-            return pubKeyCompressed;
-        }
-
-        private string EncodeECPointHexCompressed(Org.BouncyCastle.Math.EC.ECPoint point)
-        {
-            var compressedPoint = point.GetEncoded(true);
-            BigInteger biInt = new BigInteger(compressedPoint);
-
-            return biInt.ToString(16);
-        }
-
-        private Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
-        {
-            Org.BouncyCastle.Math.EC.ECPoint pubKey = curve.G.Multiply(privKey).Normalize();
-            return pubKey;
-        }
 
         private string CalcRipeMD160(string text)
         {
@@ -117,7 +92,7 @@ namespace BlockChain.Core
         /// </summary>
         private BigInteger[] SignData(BigInteger privateKey, byte[] data)
         {
-            ECDomainParameters ecSpec = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+            ECDomainParameters ecSpec = new ECDomainParameters(CryptoUtil.Curve.Curve, CryptoUtil.Curve.G, CryptoUtil.Curve.N, CryptoUtil.Curve.H);
             ECPrivateKeyParameters keyParameters = new ECPrivateKeyParameters(privateKey, ecSpec);
             IDsaKCalculator kCalculator = new HMacDsaKCalculator(new Sha256Digest());
             ECDsaSigner signer = new ECDsaSigner(kCalculator);
@@ -136,7 +111,7 @@ namespace BlockChain.Core
     {
         public bool IsValid(Transaction transaction)
         {
-            ECDomainParameters ecSpec = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+            ECDomainParameters ecSpec = new ECDomainParameters(CryptoUtil.Curve.Curve, CryptoUtil.Curve.G, CryptoUtil.Curve.N, CryptoUtil.Curve.H);
             IDsaKCalculator kCalculator = new HMacDsaKCalculator(new Sha256Digest());
 
             var point = DecodeECPointPublicKey(transaction.SenderPublicKey);
@@ -158,7 +133,7 @@ namespace BlockChain.Core
             };
 
             string tranJson = JsonConvert.SerializeObject(transactionRaw);
-            byte[] tranHash = CalcSHA256(tranJson);
+            byte[] tranHash = CryptoUtil.CalcSHA256(tranJson);
 
             return signer.VerifySignature(tranHash, pubKey1, pubKey2);
         }
@@ -168,7 +143,7 @@ namespace BlockChain.Core
             BigInteger bigInt = new BigInteger(input, 16);
             byte[] compressedKey = bigInt.ToByteArray();
 
-            var point = curve.Curve.DecodePoint(compressedKey);
+            var point = CryptoUtil.Curve.Curve.DecodePoint(compressedKey);
             return point;
         }
 
@@ -177,11 +152,22 @@ namespace BlockChain.Core
 
     public interface ICryptoUtil
     {
+        X9ECParameters Curve { get; }
+
         AsymmetricCipherKeyPair GenerateRandomKeys(int keySize = 256);
+        string GetRandomPrivateKey();
+
+        byte[] CalcSHA256(string text);
+
+        string GetPublicKeyCompressed(string privateKeyString);
     }
 
     public class CryptoUtil : ICryptoUtil
     {
+        public readonly X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
+
+        public X9ECParameters Curve { get { return curve; } }
+
         public AsymmetricCipherKeyPair GenerateRandomKeys(int keySize = 256)
         {
             ECKeyPairGenerator gen = new ECKeyPairGenerator();
@@ -192,13 +178,48 @@ namespace BlockChain.Core
             return gen.GenerateKeyPair();
         }
 
-        public string GetRandomPrivateKey(int radix)
+        public string GetRandomPrivateKey()
         {
             var randomPrivateKeyPair = GenerateRandomKeys();
 
             BigInteger privateKey = ((ECPrivateKeyParameters)randomPrivateKeyPair.Private).D;
 
-            return privateKey.ToString(radix);
+            return privateKey.ToString(16);
+        }
+
+        public byte[] CalcSHA256(string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            Sha256Digest digest = new Sha256Digest();
+            digest.BlockUpdate(bytes, 0, bytes.Length);
+            byte[] result = new byte[digest.GetDigestSize()];
+            digest.DoFinal(result, 0);
+            return result;
+        }
+
+
+        public string GetPublicKeyCompressed(string privateKeyString)
+        {
+            BigInteger privateKey = new BigInteger(privateKeyString, 16);
+            Org.BouncyCastle.Math.EC.ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
+
+            string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
+            return pubKeyCompressed;
+        }
+
+
+        protected Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
+        {
+            Org.BouncyCastle.Math.EC.ECPoint pubKey = Curve.G.Multiply(privKey).Normalize();
+            return pubKey;
+        }
+
+        protected string EncodeECPointHexCompressed(Org.BouncyCastle.Math.EC.ECPoint point)
+        {
+            var compressedPoint = point.GetEncoded(true);
+            BigInteger biInt = new BigInteger(compressedPoint);
+
+            return biInt.ToString(16);
         }
 
     }
