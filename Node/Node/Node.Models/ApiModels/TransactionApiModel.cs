@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Node.Models.ViewModels
+namespace Node.Domain.ApiModels
 {
     public class TransactionApiModel
     {

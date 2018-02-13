@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Node.Models.Exceptions
+namespace Node.Domain.Exceptions
 {
     public class TransactionNotValidException : Exception
     {

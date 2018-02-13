@@ -1,5 +1,5 @@
 ﻿
-namespace Node.Models
+namespace Node.Domain
 {
     public class Peer
     {

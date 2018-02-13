@@ -1,6 +1,7 @@
-﻿using Node.Models.ViewModels;
+﻿
+using Node.Domain.ApiModels;
 
-namespace Node.Models
+namespace Node.Domain
 {
     public static class Mapper
     {
