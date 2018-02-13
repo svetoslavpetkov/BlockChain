@@ -1,8 +1,4 @@
-﻿using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Security;
+﻿using BlockChain.Core;
 using System;
 
 namespace Wallet.Util.Core
@@ -10,6 +6,7 @@ namespace Wallet.Util.Core
     public class SimpleWalet
     {
         private ITransactionSigner Signer = new TransactionSigner();
+        private ICryptoUtil CryptoUtil = new CryptoUtil();
 
         public string PrivateKey { get; set; }
 
@@ -28,11 +25,7 @@ namespace Wallet.Util.Core
 
         public static SimpleWalet GenerateNewWallet()
         {
-            var randomPrivateKeyPair = GenerateRandomKeys();
-
-            BigInteger privateKey = ((ECPrivateKeyParameters)randomPrivateKeyPair.Private).D;
-
-            string privateKeyString = privateKey.ToString(10); // must be 16?
+            string privateKeyString = new CryptoUtil().GetRandomPrivateKey(10); // must be 16?
 
             return new SimpleWalet(privateKeyString);
         }
@@ -43,14 +36,6 @@ namespace Wallet.Util.Core
             return address;
         }
 
-        private static AsymmetricCipherKeyPair GenerateRandomKeys(int keySize = 256)
-        {
-            ECKeyPairGenerator gen = new ECKeyPairGenerator();
-            SecureRandom secureRandom = new SecureRandom();
-            KeyGenerationParameters keyGenParam =
-                new KeyGenerationParameters(secureRandom, keySize);
-            gen.Init(keyGenParam);
-            return gen.GenerateKeyPair();
-        }
+
     }
 }

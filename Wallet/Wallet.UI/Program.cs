@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlockChain.Core;
+using System;
 using System.IO;
 using Wallet.Util.Core;
 

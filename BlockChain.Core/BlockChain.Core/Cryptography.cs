@@ -8,6 +8,9 @@ using Org.BouncyCastle.Math;
 using System;
 using System.Text;
 using System.Linq;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Security;
 
 namespace BlockChain.Core
 {
@@ -167,6 +170,35 @@ namespace BlockChain.Core
 
             var point = curve.Curve.DecodePoint(compressedKey);
             return point;
+        }
+
+    }
+
+
+    public interface ICryptoUtil
+    {
+        AsymmetricCipherKeyPair GenerateRandomKeys(int keySize = 256);
+    }
+
+    public class CryptoUtil : ICryptoUtil
+    {
+        public AsymmetricCipherKeyPair GenerateRandomKeys(int keySize = 256)
+        {
+            ECKeyPairGenerator gen = new ECKeyPairGenerator();
+            SecureRandom secureRandom = new SecureRandom();
+            KeyGenerationParameters keyGenParam =
+                new KeyGenerationParameters(secureRandom, keySize);
+            gen.Init(keyGenParam);
+            return gen.GenerateKeyPair();
+        }
+
+        public string GetRandomPrivateKey(int radix)
+        {
+            var randomPrivateKeyPair = GenerateRandomKeys();
+
+            BigInteger privateKey = ((ECPrivateKeyParameters)randomPrivateKeyPair.Private).D;
+
+            return privateKey.ToString(radix);
         }
 
     }
