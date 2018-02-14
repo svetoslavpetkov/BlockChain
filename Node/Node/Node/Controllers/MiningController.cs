@@ -20,7 +20,7 @@ namespace Node.Controllers
 
         [HttpGet("getBockForMine")]
         public IActionResult GetBlockForMine(string minerAddress)
-        {
+        { 
             MiningContext context = Node.GetBlockForMine(minerAddress);
 
             return Ok(context);
