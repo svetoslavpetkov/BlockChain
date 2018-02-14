@@ -84,7 +84,7 @@ namespace Node.Domain
         public MiningContext GetMiningJob(string minerAddress, string blockHash)
         {
             Block blockForMine = BuildBlock();
-            string prevBlockHash = BlockChain.Last().BlockHash;
+            string prevBlockHash = BlockChain.Last().Value.BlockHash;
 
             MiningContext context = new MiningContext();
             context.BlockIndex = blockForMine.Index;
@@ -98,7 +98,7 @@ namespace Node.Domain
 
         private Block BuildBlock()
         {
-            var lastBlock = BlockChain.Last();
+            var lastBlock = BlockChain.Last().Value;
             Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockHash, Difficulty);
 
             return tempBlock;
