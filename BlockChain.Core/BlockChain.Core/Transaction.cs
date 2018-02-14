@@ -9,9 +9,7 @@ namespace BlockChain.Core
 
         public decimal Amount { get; set; }
         public DateTime DateCreated { get; set; }
-
     }
-
 
     public class Transaction : TransactionRaw
     {

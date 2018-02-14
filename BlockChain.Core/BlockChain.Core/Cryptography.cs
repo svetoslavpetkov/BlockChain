@@ -16,13 +16,24 @@ using System.Security.Cryptography;
 namespace BlockChain.Core
 {
 
-    public class CryptographyBase 
+    public class CryptographyBase
     {
         protected readonly ICryptoUtil CryptoUtil = new CryptoUtil();
 
+        protected string CalcRipeMD160(string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            RipeMD160Digest digest = new RipeMD160Digest();
+            digest.BlockUpdate(bytes, 0, bytes.Length);
+            byte[] result = new byte[digest.GetDigestSize()];
+            digest.DoFinal(result, 0);
+            return BytesToHex(result);
+        }
 
-
-
+        private string BytesToHex(byte[] bytes)
+        {
+            return string.Concat(bytes.Select(b => b.ToString("x2")));
+        }
     }
 
     public interface ITransactionSigner
@@ -51,13 +62,15 @@ namespace BlockChain.Core
             byte[] tranHash = CryptoUtil.CalcSHA256(tranJson);
 
             BigInteger[] tranSignature = SignData(hexPrivateKey, tranHash);
+            string txhash = CryptoUtil.CalcSHA256String(tranJson);
+
             Transaction signedTransaction = new Transaction()
             {
                 FromAddress = transactionRaw.FromAddress,
                 ToAddress = transactionRaw.ToAddress,
                 Amount = transactionRaw.Amount,
                 DateCreated = transactionRaw.DateCreated,
-
+                TransactionHash = txhash,
                 SenderPublicKey = publicKey,
                 Signature = new string[] { tranSignature[0].ToString(16), tranSignature[1].ToString(16) }
             };
@@ -68,23 +81,6 @@ namespace BlockChain.Core
         public string CalculateAddress(string privateKey)
         {
             return CalcRipeMD160(CryptoUtil.GetPublicKeyCompressed(privateKey));
-        }
-
-
-
-        private string CalcRipeMD160(string text)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            RipeMD160Digest digest = new RipeMD160Digest();
-            digest.BlockUpdate(bytes, 0, bytes.Length);
-            byte[] result = new byte[digest.GetDigestSize()];
-            digest.DoFinal(result, 0);
-            return BytesToHex(result);
-        }
-
-        private string BytesToHex(byte[] bytes)
-        {
-            return string.Concat(bytes.Select(b => b.ToString("x2")));
         }
 
         /// <summary>
@@ -105,6 +101,8 @@ namespace BlockChain.Core
     public interface ITransactionValidator
     {
         bool IsValid(Transaction transaction);
+        bool IsValidateHash(Transaction transaction);
+        string GetAddress(string publicKey);
     }
 
     public class TransactionValidator : CryptographyBase, ITransactionValidator
@@ -138,6 +136,26 @@ namespace BlockChain.Core
             return signer.VerifySignature(tranHash, pubKey1, pubKey2);
         }
 
+        public bool IsValidateHash(Transaction transaction)
+        {
+            TransactionRaw txRaw = new TransactionRaw();
+            txRaw.ToAddress = transaction.ToAddress;
+            txRaw.FromAddress = transaction.FromAddress;
+            txRaw.Amount = transaction.Amount;
+            txRaw.DateCreated = transaction.DateCreated;
+
+            string jsonTx = JsonConvert.SerializeObject(txRaw);
+            string txHash = CryptoUtil.CalcSHA256String(jsonTx);
+
+            return transaction.TransactionHash != txHash;
+        }
+
+        public string GetAddress(string publicKey)
+        {
+            string address = CalcRipeMD160(publicKey);
+            return address;
+        }
+
         private Org.BouncyCastle.Math.EC.ECPoint DecodeECPointPublicKey(string input)
         {
             BigInteger bigInt = new BigInteger(input, 16);
@@ -146,18 +164,19 @@ namespace BlockChain.Core
             var point = CryptoUtil.Curve.Curve.DecodePoint(compressedKey);
             return point;
         }
-
     }
-
 
     public interface ICryptoUtil
     {
         X9ECParameters Curve { get; }
 
         AsymmetricCipherKeyPair GenerateRandomKeys(int keySize = 256);
+
         string GetRandomPrivateKey();
 
         byte[] CalcSHA256(string text);
+
+        string CalcSHA256String(string text);
 
         string GetPublicKeyCompressed(string privateKeyString);
 
@@ -207,6 +226,16 @@ namespace BlockChain.Core
             return result;
         }
 
+        public string CalcSHA256String(string text)
+        {
+            byte[] bytes = CalcSHA256(text);
+            StringBuilder hash = new StringBuilder();
+
+            foreach (byte b in bytes)
+                hash.AppendFormat("{0:X2}", b);
+
+            return hash.ToString();
+        }
 
         public string GetPublicKeyCompressed(string privateKeyString)
         {
@@ -216,7 +245,6 @@ namespace BlockChain.Core
             string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
             return pubKeyCompressed;
         }
-
 
         protected Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
         {
@@ -231,7 +259,5 @@ namespace BlockChain.Core
 
             return biInt.ToString(16);
         }
-
     }
 }
-
