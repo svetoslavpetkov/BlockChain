@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BlockChain.Core;
+using Node.Domain.ApiModels;
 
 namespace Node.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/transaction")]
     public class TransactionController : Controller
     {
         private Domain.Node Node { get; set; }
@@ -22,10 +23,36 @@ namespace Node.Controllers
             Node.AddTransaction(transaction);
         }
 
-        [HttpGet("api/[controller]/{tx}")]
-        public void Get(string tx)
+        [HttpGet("{tx}")]
+        public IActionResult Get(string tx)
         {
-            var pendingTransaction = Node.PendingTransactions.FirstOrDefault(t => t.TransactionHash == tx);
+            GetTransactionApiModel result = Node.PendingTransactions
+                .Where(t => t.TransactionHash == tx)
+                .Select(t=> GetTransactionApiModel.FromTransaction(t))
+                .FirstOrDefault();
+            if (result == null )
+            {
+                result = Node.BlockChain
+                    .SelectMany(b => b.Value.Transactions.Select(t => new { BlockIndex = b.Key, Transaction = t }))
+                    .Where(t => t.Transaction.TransactionHash == tx)
+                    .Select(x => GetTransactionApiModel.FromTransaction(x.Transaction, x.BlockIndex))
+                    .FirstOrDefault();
+            }
+
+
+            if (result != null)
+            {
+                return Ok(GetTransactionApiModel.FromTransaction(result));
+            }
+
+            return NotFound($"transaction with id {tx} is not found");
+        }
+
+
+        [HttpGet("pending")]
+        public IEnumerable<GetTransactionApiModel> GetPending()
+        {
+            return Node.PendingTransactions.Select(p => GetTransactionApiModel.FromTransaction(p));
         }
     }
 }
