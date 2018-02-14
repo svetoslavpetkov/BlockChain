@@ -22,7 +22,7 @@ namespace Miner
                 new String('9', 64 - input.Item2.Difficulty);
 
             string precomputedData = input.Item2.BlockIndex.ToString()
-                + input.Item2.BlockData
+                + input.Item2.BlockHash
                 + input.Item2.PrevBlockHash;
 
             string data;
