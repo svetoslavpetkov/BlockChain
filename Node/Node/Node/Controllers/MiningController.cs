@@ -27,9 +27,9 @@ namespace Node.Controllers
         }
 
         [HttpPost]
-        public IActionResult NonceFound(string minerAddress, int nonce)
+        public IActionResult NonceFound(string minerAddress, int nonce, string hash)
         {
-            Node.NonceFound(minerAddress, nonce);
+            Node.NonceFound(minerAddress, nonce, hash);
             return Ok();
         }
     }

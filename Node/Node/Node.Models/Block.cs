@@ -13,6 +13,10 @@ namespace Node.Domain
         public string PreviousBlockHash { get; private set; }
         public string MinedBy { get; private set; }
         public string BlockDataHash { get; private set; }
+        /// <summary>
+        /// Used to store hash calculated from miner    
+        /// </summary>
+        public string BlockHash { get; private set; }
 
         public int Nonce { get; private set; }
         public DateTime CreatedDate { get; private set; }
@@ -32,6 +36,12 @@ namespace Node.Domain
             string hash = CryptoUtil.CalcSHA256String(json);
 
             return hash;
+        }
+
+        public void BlockMined(int nonce, string hash)
+        {
+            Nonce = Nonce;
+            BlockHash = hash;
         }
 
         public static Block CreateGenesisBlock(int difficulty)

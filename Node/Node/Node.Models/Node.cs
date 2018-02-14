@@ -21,30 +21,7 @@ namespace Node.Domain
 
         public TransactionValidator TransactionValidator { get; set; }
 
-        public void NonceFound(string minerAddress, int nonce)
-        {
-            Block blockForValidate = BlocksInProgress[minerAddress];
-            if (blockForValidate == null)
-                return;
-
-            // TODO validate nonce by calculating hash
-
-            foreach (var transaction in blockForValidate.Transactions)
-            {
-                string address = transaction.FromAddress;
-
-                var addressTransactions = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
-                decimal balance = 0;
-                foreach (var tx in addressTransactions)
-                {
-                    if (tx.FromAddress == address)
-                        balance -= tx.Amount;
-
-                    if (tx.ToAddress == address)
-                        balance += tx.Amount;
-                }
-            }
-        }
+      
 
         public ICryptoUtil CryptoUtil { get; set; }
 
@@ -101,6 +78,38 @@ namespace Node.Domain
 
             PendingTransactions.Add(transaction);
             BroadcastToPeers(transaction);
+        }
+
+        public void NonceFound(string minerAddress, int nonce, string hash)
+        {
+            Block block = BlocksInProgress[minerAddress];
+            if (block == null)
+                return;
+
+            block.BlockMined(nonce, hash);
+
+            // TODO validate nonce by calculating hash
+
+            foreach (var transaction in block.Transactions)
+            {
+                string address = transaction.FromAddress;
+
+                var addressTransactions = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
+                decimal balance = 0;
+                foreach (var tx in addressTransactions)
+                {
+                    if (tx.FromAddress == address)
+                        balance -= tx.Amount;
+
+                    if (tx.ToAddress == address)
+                        balance += tx.Amount;
+                }
+
+                transaction.TranserSuccessfull = balance >= transaction.Amount;
+            }
+
+            BlockChain.TryAdd(block.Index, block);
+            BlocksInProgress[minerAddress] = null;
         }
 
         private void BroadcastToPeers(Core.Transaction tx)
