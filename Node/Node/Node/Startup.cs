@@ -18,7 +18,7 @@ namespace Node
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
+            services.AddCors();
             services.AddSingleton<Domain.Node>();
         }
 

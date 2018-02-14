@@ -179,6 +179,8 @@ namespace BlockChain.Core
         string CalcSHA256String(string text);
 
         string GetPublicKeyCompressed(string privateKeyString);
+
+        string RecoverPrivateKey(string seed);
     }
 
     public class CryptoUtil : ICryptoUtil
@@ -202,6 +204,14 @@ namespace BlockChain.Core
             var randomPrivateKeyPair = GenerateRandomKeys();
 
             BigInteger privateKey = ((ECPrivateKeyParameters)randomPrivateKeyPair.Private).D;
+
+            return privateKey.ToString(16);
+        }
+
+        public string RecoverPrivateKey(string seed)
+        {
+            var sha = CalcSHA256(seed);
+            BigInteger privateKey = new BigInteger(sha);
 
             return privateKey.ToString(16);
         }

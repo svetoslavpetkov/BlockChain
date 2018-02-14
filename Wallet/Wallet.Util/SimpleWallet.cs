@@ -30,6 +30,18 @@ namespace Wallet.Util
             return new SimpleWallet(privateKeyString);
         }
 
+        public decimal GetAmount()
+        {
+            return 5;
+        }
+
+        public static SimpleWallet GenerateNewWallet(string menmonic,string password)
+        {
+            string privateKey = new CryptoUtil().RecoverPrivateKey(menmonic + password);
+
+            return new SimpleWallet(privateKey);
+        }
+
         public string GetAddress()
         {
             string address = Signer.CalculateAddress(PrivateKey);

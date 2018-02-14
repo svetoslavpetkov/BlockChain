@@ -3,6 +3,7 @@ using Node.Domain.Exceptions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Core = BlockChain.Core;
 using System.Linq;
 
@@ -10,28 +11,29 @@ namespace Node.Domain
 {
     public class Node
     {
+        public Guid Identifier { get; set; } = new Guid();
         public string Name { get; private set; }
-        public string About { get; private set; }
+        public string About { get; private set; }       
 
-        private ConcurrentBag<Block> BlockChain { get; set; }
-        private Dictionary<int, string> BlockHashes { get; set; }
-        private ConcurrentBag<Core.Transaction> PendingTransactions { get; set; }
-        public Dictionary<string, Block> MiningJobs { get; set; }
-        public int Difficulty { get; set; }
-        public TransactionValidator TransactionValidator { get;set; }
-        public ICryptoUtil CryptoUtil { get;set; }
+        public ConcurrentDictionary<int,Block> BlockChain { get; private set; }
+        public ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
+        public ConcurrentDictionary<string, Block> MiningJobs { get; private set; }
+        public int Difficulty { get; private set; }
+        public TransactionValidator TransactionValidator { get; set; }
+        public ICryptoUtil CryptoUtil { get; set; }
 
-        public List<Peer> Peers { get; private set; }
+        public ConcurrentBag<Peer> Peers { get; private set; }
 
         public Node()
         {
-            BlockChain = new ConcurrentBag<Block>();
+            BlockChain = new ConcurrentDictionary<int,Block>();
             PendingTransactions = new ConcurrentBag<Transaction>();
-            MiningJobs = new Dictionary<string, Block>();
-            Peers = new List<Peer>();
+            MiningJobs = new ConcurrentDictionary<string, Block>();
+            Peers = new ConcurrentBag<Peer>();
+            Difficulty = 5;
 
             Block genesisBlock = Block.CreateGenesisBlock(Difficulty);
-            BlockChain.Add(genesisBlock);
+            BlockChain.TryAdd(0, genesisBlock);
 
             TransactionValidator = new TransactionValidator();
             CryptoUtil = new CryptoUtil();
@@ -39,6 +41,19 @@ namespace Node.Domain
 
         public void AddTransaction(Core.Transaction transaction)
         {
+            //check whetehr we know that transaction
+            if(PendingTransactions.FirstOrDefault(t => t.TransactionHash == transaction.TransactionHash) != null)
+            {
+                //should we also notify other perrs for known transactions ?
+                return;
+            }
+
+            //check whether transaction is already mined
+            if(BlockChain.Any(b=> b.Value.Transactions.Any(t=> t.TransactionHash == transaction.TransactionHash)))
+            {
+                return;
+            }
+
             if (transaction == null)
                 throw new ArgumentException("'transaction' object cannot be null");
 
@@ -55,8 +70,8 @@ namespace Node.Domain
 
             string address = TransactionValidator.GetAddress(transaction.SenderPublicKey);
             if (address != transaction.FromAddress)
-                throw new TransactionNotValidException("Owner address is not valid.");
-
+                throw new TransactionNotValidException("Provided address is not valid.");
+            
             PendingTransactions.Add(transaction);
             BroadcastToPeers(transaction);
         }
@@ -66,7 +81,7 @@ namespace Node.Domain
             //TODO
         }
 
-        public MiningContext StartMining(string minerAddress)
+        public MiningContext GetMiningJob(string minerAddress, string blockHash)
         {
             Block blockForMine = BuildBlock();
             string prevBlockHash = BlockChain.Last().BlockHash;
