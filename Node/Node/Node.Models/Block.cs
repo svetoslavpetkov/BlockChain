@@ -29,8 +29,8 @@ namespace Node.Domain
             {
                 Transactions = new List<Transaction>()
                 {
-                    new Transaction() { ToAddress="a1",Amount=1000,DateCreated = now.AddDays(-10) },
-                    new Transaction() { ToAddress="a2",Amount=1000,DateCreated = now.AddDays(-10) },
+                    new Transaction() { FromAddress="GENESIS" ,ToAddress="a1",Amount=1000,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_010101010101010101" },
+                    new Transaction() { FromAddress="GENESIS" ,ToAddress="a2",Amount=1000,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_020202020202020202" }, 
                 },
                 CreatedDate = DateTime.UtcNow,
                 Difficulty = 1,
