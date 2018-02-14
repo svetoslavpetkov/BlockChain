@@ -10,29 +10,29 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Wallet.Util;
 
 namespace Wallet.DesktopApp
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for Login.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Login : Window
     {
-        private SimpleWallet Wallet = null;
-
-        public MainWindow(SimpleWallet wallet)
+        public Login()
         {
             InitializeComponent();
-            Wallet = wallet;
+        }
 
-            this.ownAddress.Text = wallet.GetAddress();
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string mnemonic = this.mnemonic.Text;
+            string password = this.password.Password;
 
-            this.amount.Content = $"{wallet.GetAmount()} coins";
 
-            this.ownAddress.Text = wallet.GetAddress();
+            MainWindow mainWindow = new MainWindow(Util.SimpleWallet.GenerateNewWallet(mnemonic, password));
+            mainWindow.Show();
+            this.Close();
         }
     }
 }

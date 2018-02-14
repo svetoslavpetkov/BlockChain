@@ -1,15 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <AssemblyName>Wallet.Util</AssemblyName>
     <RootNamespace>Wallet.Util</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="HBitcoin" Version="0.1.8.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\BlockChain.Core\BlockChain.Core\BlockChain.Core.csproj" />

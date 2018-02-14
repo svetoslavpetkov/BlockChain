@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wallet.DesktopApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="484.112" Width="701.636">
     <Grid>
-        
+        <Label Content="MyWallet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="36"/>
+        <Label Content="Address" HorizontalAlignment="Left" Margin="10,98,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label Content="Ballance" HorizontalAlignment="Left" Margin="10,160,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label x:Name="amount" Content="0 coins" HorizontalAlignment="Left" Margin="119,160,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox x:Name="ownAddress" HorizontalAlignment="Left" Height="37" Margin="119,103,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
+        <Label Content="SendTo" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox x:Name="remoteAddress" HorizontalAlignment="Left" Height="37" Margin="119,238,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
+        <Button Content="Send $$$" HorizontalAlignment="Left" Margin="544,324,0,0" VerticalAlignment="Top" Width="122" FontSize="20" Height="41"/>
     </Grid>
 </Window>
