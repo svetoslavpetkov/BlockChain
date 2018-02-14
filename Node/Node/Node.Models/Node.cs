@@ -43,6 +43,12 @@ namespace Node.Domain
             CryptoUtil = new CryptoUtil();
         }
 
+        public decimal GetBalance(string address)
+        {
+            decimal balance = CalculateBalance(address);
+            return balance;
+        }
+
         public void AddTransaction(Core.Transaction transaction)
         {
             //check whetehr we know that transaction
@@ -92,24 +98,28 @@ namespace Node.Domain
 
             foreach (var transaction in block.Transactions)
             {
-                string address = transaction.FromAddress;
-
-                var addressTransactions = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
-                decimal balance = 0;
-                foreach (var tx in addressTransactions)
-                {
-                    if (tx.FromAddress == address)
-                        balance -= tx.Amount;
-
-                    if (tx.ToAddress == address)
-                        balance += tx.Amount;
-                }
-
+                decimal balance = CalculateBalance(transaction.FromAddress);
                 transaction.TranserSuccessfull = balance >= transaction.Amount;
             }
 
             BlockChain.TryAdd(block.Index, block);
             BlocksInProgress[minerAddress] = null;
+        }
+
+        private decimal CalculateBalance(string address)
+        {
+            var addressTransactions = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
+            decimal balance = 0;
+            foreach (var tx in addressTransactions)
+            {
+                if (tx.FromAddress == address)
+                    balance -= tx.Amount;
+
+                if (tx.ToAddress == address)
+                    balance += tx.Amount;
+            }
+
+            return balance;
         }
 
         private void BroadcastToPeers(Core.Transaction tx)

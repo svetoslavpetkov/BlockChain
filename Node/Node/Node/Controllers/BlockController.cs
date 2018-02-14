@@ -33,13 +33,17 @@ namespace Node.Controllers
 
         }
 
-
         [HttpGet("/new/{index:int}/{peer}")]
         public void NewBlockFound(int index, string peer)
         {
             //new block foudn by peer
-
         }
 
+        [HttpDelete("/balance/{address:string}")]
+        public IActionResult Balance(string address)
+        {
+            decimal balance = Node.GetBalance(address);
+            return Ok(balance);
+        }
     }
 }
