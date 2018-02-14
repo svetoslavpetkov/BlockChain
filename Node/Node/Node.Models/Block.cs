@@ -12,7 +12,7 @@ namespace Node.Domain
         public int Difficulty { get; private set; }
         public string PreviousBlockHash { get; private set; }
         public string MinedBy { get; private set; }
-        public string BlockHash { get; private set; }
+        public string BlockDataHash { get; private set; }
 
         public int Nonce { get; private set; }
         public DateTime CreatedDate { get; private set; }
@@ -52,7 +52,7 @@ namespace Node.Domain
                 MinedBy = string.Empty,
             };
 
-            genesis.BlockHash = genesis.GetHash();
+            genesis.BlockDataHash = genesis.GetHash();
 
             return genesis;
         }
@@ -60,7 +60,7 @@ namespace Node.Domain
         public static Block BuildBlockForMiner(int index, List<Transaction> pendingTxs, string prevBlockHash, int difficulty)
         {
            Block block = new Block { Index = index, Transactions = pendingTxs, PreviousBlockHash = prevBlockHash, Difficulty = difficulty };
-           block.BlockHash = block.GetHash();
+           block.BlockDataHash = block.GetHash();
            return block;
         }
     }

@@ -48,7 +48,6 @@ namespace Node.Controllers
             return NotFound($"transaction with id {tx} is not found");
         }
 
-
         [HttpGet("pending")]
         public IEnumerable<GetTransactionApiModel> GetPending()
         {

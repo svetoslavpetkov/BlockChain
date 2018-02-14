@@ -20,6 +20,32 @@ namespace Node.Domain
         private ConcurrentDictionary<string, Block> BlocksInProgress { get; set; }
 
         public TransactionValidator TransactionValidator { get; set; }
+
+        public void NonceFound(string minerAddress, int nonce)
+        {
+            Block blockForValidate = BlocksInProgress[minerAddress];
+            if (blockForValidate == null)
+                return;
+
+            // TODO validate nonce by calculating hash
+
+            foreach (var transaction in blockForValidate.Transactions)
+            {
+                string address = transaction.FromAddress;
+
+                var addressTransactions = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
+                decimal balance = 0;
+                foreach (var tx in addressTransactions)
+                {
+                    if (tx.FromAddress == address)
+                        balance -= tx.Amount;
+
+                    if (tx.ToAddress == address)
+                        balance += tx.Amount;
+                }
+            }
+        }
+
         public ICryptoUtil CryptoUtil { get; set; }
 
         public ConcurrentBag<Peer> Peers { get; private set; }
@@ -120,11 +146,11 @@ namespace Node.Domain
 
         private MiningContext BuildNewMinerJob(Block blockForMine)
         {
-            string prevBlockHash = BlockChain.Last().Value.BlockHash;
+            string prevBlockHash = BlockChain.Last().Value.BlockDataHash;
 
             MiningContext context = new MiningContext();
             context.BlockIndex = blockForMine.Index;
-            context.BlockHash = blockForMine.BlockHash;
+            context.BlockHash = blockForMine.BlockDataHash;
             context.Difficulty = Difficulty;
             context.PrevBlockHash = prevBlockHash;
             context.Timestamp = blockForMine.CreatedDate;
@@ -135,7 +161,7 @@ namespace Node.Domain
         private Block BuildBlock()
         {
             var lastBlock = BlockChain.Last().Value;
-            Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockHash, Difficulty);
+            Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockDataHash, Difficulty);
 
             return tempBlock;
         }

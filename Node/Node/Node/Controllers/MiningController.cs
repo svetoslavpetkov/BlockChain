@@ -25,5 +25,12 @@ namespace Node.Controllers
 
             return Ok(context);
         }
+
+        [HttpPost]
+        public IActionResult NonceFound(string minerAddress, int nonce)
+        {
+            Node.NonceFound(minerAddress, nonce);
+            return Ok();
+        }
     }
 }
