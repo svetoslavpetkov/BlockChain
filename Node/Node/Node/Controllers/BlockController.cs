@@ -39,7 +39,7 @@ namespace Node.Controllers
             //new block foudn by peer
         }
 
-        [HttpDelete("/balance/{address:string}")]
+        [HttpGet("balance/{address}")]
         public IActionResult Balance(string address)
         {
             decimal balance = Node.GetBalance(address);
