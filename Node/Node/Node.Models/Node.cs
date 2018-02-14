@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Core = BlockChain.Core;
-using System.Linq;
 
 namespace Node.Domain
 {
@@ -19,6 +18,7 @@ namespace Node.Domain
         public ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
         public ConcurrentDictionary<string, Block> MiningJobs { get; private set; }
         public int Difficulty { get; private set; }
+
         public TransactionValidator TransactionValidator { get; set; }
         public ICryptoUtil CryptoUtil { get; set; }
 
@@ -81,7 +81,7 @@ namespace Node.Domain
             //TODO
         }
 
-        public MiningContext GetMiningJob(string minerAddress, string blockHash)
+        public MiningContext GetBlockForMine(string minerAddress)
         {
             Block blockForMine = BuildBlock();
             string prevBlockHash = BlockChain.Last().Value.BlockHash;
