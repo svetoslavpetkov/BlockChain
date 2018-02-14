@@ -1,14 +1,14 @@
 ﻿using BlockChain.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Node.Domain
 {
     public class Block
     {
         public int Index { get; private set; }
-        public List<Transaction> Transactions { get; private set; }
+        public IReadOnlyCollection<Transaction> Transactions { get; private set; }
         public int Difficulty { get; private set; }
         public string PreviousBlockHash { get; private set; }
         public string MinedBy { get; private set; }
@@ -17,15 +17,27 @@ namespace Node.Domain
         public int Nonce { get; private set; }
         public DateTime CreatedDate { get; private set; }
 
+        public ICryptoUtil CryptoUtil { get; set; }
+
         public Block()
         {
-            Transactions = new List<Transaction>();
+            Transactions = new  List<Transaction>();
+            CryptoUtil = new CryptoUtil();
         }
 
-        public static Block CreateGenesisBlock()
+        private string GetHash()
+        {
+            var objectForHash = new { Index, Transactions, Difficulty, PreviousBlockHash, CreatedDate,Nonce };
+            string json = JsonConvert.SerializeObject(objectForHash);
+            string hash = CryptoUtil.CalcSHA256String(json);
+
+            return hash;
+        }
+
+        public static Block CreateGenesisBlock(int difficulty)
         {
             DateTime now = DateTime.Now;
-            return new Block()
+            Block genesis = new Block()
             {
                 Transactions = new List<Transaction>()
                 {
@@ -33,12 +45,23 @@ namespace Node.Domain
                     new Transaction() { ToAddress="a2",Amount=1000,DateCreated = now.AddDays(-10) },
                 },
                 CreatedDate = DateTime.UtcNow,
-                Difficulty = 1,
+                Difficulty = difficulty,
                 PreviousBlockHash = string.Empty,
-                Index = 0,
-                Nonce = 12313,
+                Index = 1,
+                Nonce = 02313,
                 MinedBy = string.Empty,
             };
+
+            genesis.BlockHash = genesis.GetHash();
+
+            return genesis;
+        }
+
+        public static Block BuildBlockForMiner(int index, List<Transaction> pendingTxs, string prevBlockHash, int difficulty)
+        {
+           Block block = new Block { Index = index, Transactions = pendingTxs, PreviousBlockHash = prevBlockHash, Difficulty = difficulty };
+           block.BlockHash = block.GetHash();
+           return block;
         }
     }
 }
