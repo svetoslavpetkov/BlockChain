@@ -27,7 +27,7 @@ namespace Node.Domain
 
         private string GetHash()
         {
-            var objectForHash = new { Index, Transactions, Difficulty, PreviousBlockHash, CreatedDate,Nonce };
+            var objectForHash = new { Index, Transactions, Difficulty, PreviousBlockHash, CreatedDate };
             string json = JsonConvert.SerializeObject(objectForHash);
             string hash = CryptoUtil.CalcSHA256String(json);
 
