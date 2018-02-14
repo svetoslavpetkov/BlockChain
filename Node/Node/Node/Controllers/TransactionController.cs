@@ -17,7 +17,7 @@ namespace Node.Controllers
             Node = node;
         }
 
-        [HttpPost]
+        [HttpPost("new")]
         public void New([FromBody]Transaction transaction)
         {
             Node.AddTransaction(transaction);

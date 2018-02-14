@@ -147,7 +147,7 @@ namespace BlockChain.Core
             string jsonTx = JsonConvert.SerializeObject(txRaw);
             string txHash = CryptoUtil.CalcSHA256String(jsonTx);
 
-            return transaction.TransactionHash != txHash;
+            return transaction.TransactionHash == txHash;
         }
 
         public string GetAddress(string publicKey)

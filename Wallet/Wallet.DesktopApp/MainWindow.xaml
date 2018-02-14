@@ -10,10 +10,13 @@
         <Label Content="MyWallet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="36"/>
         <Label Content="Address" HorizontalAlignment="Left" Margin="10,98,0,0" VerticalAlignment="Top" FontSize="24"/>
         <Label Content="Ballance" HorizontalAlignment="Left" Margin="10,160,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <Label x:Name="amount" Content="0 coins" HorizontalAlignment="Left" Margin="119,160,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label x:Name="ballace" Content="0 coins" HorizontalAlignment="Left" Margin="119,160,0,0" VerticalAlignment="Top" FontSize="24"/>
         <TextBox x:Name="ownAddress" HorizontalAlignment="Left" Height="37" Margin="119,103,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
         <Label Content="SendTo" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" FontSize="24"/>
         <TextBox x:Name="remoteAddress" HorizontalAlignment="Left" Height="37" Margin="119,238,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
-        <Button Content="Send $$$" HorizontalAlignment="Left" Margin="544,324,0,0" VerticalAlignment="Top" Width="122" FontSize="20" Height="41"/>
+        <Button x:Name="btnSend" Content="Send $$$" HorizontalAlignment="Left" Margin="544,356,0,0" VerticalAlignment="Top" Width="122" FontSize="20" Height="41" Click="Button_Click"/>
+        <Label Content="Amount" HorizontalAlignment="Left" Margin="10,300,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox x:Name="amount" HorizontalAlignment="Left" Height="37" Margin="119,305,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
+        <Label x:Name="result" Content="result" HorizontalAlignment="Left" Margin="54,366,0,0" Visibility="Hidden" VerticalAlignment="Top" FontSize="24" Width="436"/>
     </Grid>
 </Window>
