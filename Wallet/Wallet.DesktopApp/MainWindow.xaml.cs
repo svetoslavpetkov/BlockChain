@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,9 +34,54 @@ namespace Wallet.DesktopApp
 
             this.ownAddress.Text = wallet.GetAddress();
 
-            this.amount.Content = $"{wallet.GetAmount()} coins";
+            this.ballace.Content = $"{wallet.GetAmount()} coins";
 
             this.ownAddress.Text = wallet.GetAddress();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string from = this.ownAddress.Text;
+            string to = this.remoteAddress.Text;
+            decimal amount = decimal.Parse(this.amount.Text);
+
+            var transaction = Wallet.Sign(to, amount);
+
+            this.result.Content = "Sending transaction ....";
+            this.result.Visibility = Visibility.Visible;
+            
+            var result = MakePost("http://localhost:5555/api/transaction/new",transaction);
+
+            this.result.Content = result ? "Transaction send" : "Transaction rejected";
+        }
+
+
+
+        bool MakePost<T>(string url,T postObject)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                string postContent = JsonConvert.SerializeObject(postObject);
+                var content = new StringContent(postContent, Encoding.UTF8, "application/json");
+
+                var result = httpClient.PostAsync(url, content).GetAwaiter().GetResult();
+
+                return result.IsSuccessStatusCode;
+            }
+        }
+
+
+        void Get(string url)
+        {
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                //string postContent = JsonConvert.SerializeObject(postObject);
+                //svar content = new StringContent(postContent, Encoding.UTF8, "application/json");
+                var task = httpClient.GetAsync(url);
+
+                var result = task.GetAwaiter().GetResult();
+            }
         }
     }
 }
