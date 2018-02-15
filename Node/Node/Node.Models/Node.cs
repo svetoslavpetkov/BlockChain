@@ -21,6 +21,9 @@ namespace Node.Domain
 
         public TransactionValidator TransactionValidator { get; set; }
 
+
+        private IProofOfWork ProofOfWork { get; set; }
+
       
 
         public ICryptoUtil CryptoUtil { get; set; }
@@ -41,6 +44,7 @@ namespace Node.Domain
 
             TransactionValidator = new TransactionValidator();
             CryptoUtil = new CryptoUtil();
+            ProofOfWork = new ProofOfWork();
         }
 
         public decimal GetBalance(string address)
@@ -95,6 +99,11 @@ namespace Node.Domain
             block.BlockMined(nonce, hash, minerAddress);
 
             // TODO validate nonce by calculating hash
+
+            if(!ProofOfWork.IsProofValid(block.Difficulty, block.Index, block.BlockDataHash, block.PreviousBlockHash, block.CreatedDate, nonce, hash))
+            {
+                throw new Exception("Invalid proof of work");
+            }
 
             foreach (var transaction in block.Transactions)
             {

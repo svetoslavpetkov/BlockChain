@@ -67,6 +67,23 @@ namespace BlockChain.Core
             return hash.ToString();
         }
 
+        public static string ByteArrayToHexString(byte[] bytes)
+        {
+            StringBuilder result = new StringBuilder(bytes.Length * 2);
+            string hexAlphabet = "0123456789ABCDEF";
+
+            foreach (byte b in bytes)
+            {
+                result.Append(hexAlphabet[(int)(b >> 4)]);
+                result.Append(hexAlphabet[(int)(b & 0x0F)]);
+            }
+
+            return result.ToString();
+        }
+
+
+
+
         public string GetPublicKeyCompressed(string privateKeyString)
         {
             BigInteger privateKey = new BigInteger(privateKeyString, 16);

@@ -70,7 +70,7 @@ namespace Node.Domain
 
         public static Block BuildBlockForMiner(int index, List<Transaction> pendingTxs, string prevBlockHash, int difficulty)
         {
-           Block block = new Block { Index = index, Transactions = pendingTxs, PreviousBlockHash = prevBlockHash, Difficulty = difficulty };
+           Block block = new Block { Index = index, Transactions = pendingTxs, PreviousBlockHash = prevBlockHash, Difficulty = difficulty, CreatedDate = DateTime.Now };
            block.BlockDataHash = block.GetHash();
            return block;
         }

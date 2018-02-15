@@ -8,7 +8,7 @@ namespace Miner
     {
         public string MinerAddress { get; set; }
 
-        public ulong Nonce { get; set; }
+        public int Nonce { get; set; }
 
         public string Hash { get; set; }
     }

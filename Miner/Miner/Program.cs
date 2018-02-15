@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BlockChain.Core;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,31 +19,27 @@ namespace Miner
             TimeSpan timeLimit = new TimeSpan(0, 0, 5);
             Stopwatch sw = Stopwatch.StartNew();
             BlockInput input = Get<BlockInput>(nodeAddress + "/api/mining/getBockForMine/" + minerAddress);
+
+            IProofOfWork proofOfWork = new ProofOfWork();
             while (true)
             {
                 sw.Restart();
 
                 Boolean blockFound = false;
-                UInt64 nonce = 0;
-                string timestamp = input.Timestamp.ToString("o");
-                string difficulty = new String('0', input.Difficulty) +
-                    new String('9', 64 - input.Difficulty);
+                int nonce = 0;
 
-                string precomputedData = input.BlockIndex.ToString()
-                    + input.BlockHash
-                    + input.PrevBlockHash;
+                string precomputedData = proofOfWork.PrecomputeData(input.BlockIndex, input.BlockHash, input.PrevBlockHash, input.Timestamp);
 
                 Console.WriteLine($"New job started at : " + DateTime.Now + " for block index " + input.BlockIndex);
 
 
                 string data;
                 string blockHash;
-                while (!blockFound && nonce < UInt32.MaxValue)
-                {
-                    data = precomputedData + timestamp + nonce.ToString();
-                    blockHash = ByteArrayToHexString(Sha256(Encoding.UTF8.GetBytes(data)));
+                while (!blockFound && nonce < int.MaxValue)
+                {                    
+                    blockHash = proofOfWork.Compute(precomputedData,nonce);
 
-                    if (String.CompareOrdinal(blockHash, difficulty) < 0)
+                    if (proofOfWork.IsProofValid(blockHash,input.Difficulty))
                     {
                         MakePost(nodeAddress + "/api/mining/noncefound", new BlockMinedRequest { MinerAddress= minerAddress, Nonce = nonce, Hash =  blockHash });
                         Console.WriteLine($"Block mined. Nonce: {nonce} , Hash: {blockHash}");
@@ -63,29 +60,6 @@ namespace Miner
                 }
             }
         }
-
-
-        public static byte[] Sha256(byte[] array)
-        {
-            SHA256Managed hashstring = new SHA256Managed();
-            return hashstring.ComputeHash(array);
-        }
-
-        public static string ByteArrayToHexString(byte[] bytes)
-        {
-            StringBuilder result = new StringBuilder(bytes.Length * 2);
-            string hexAlphabet = "0123456789ABCDEF";
-
-            foreach (byte b in bytes)
-            {
-                result.Append(hexAlphabet[(int)(b >> 4)]);
-                result.Append(hexAlphabet[(int)(b & 0x0F)]);
-            }
-
-            return result.ToString();
-        }
-
-
 
         public static T Get<T>(string url)
             where T: class
