@@ -2,6 +2,7 @@
 using Node.Domain.Exceptions;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using Core = BlockChain.Core;
 
@@ -24,7 +25,7 @@ namespace Node.Domain
 
         private IProofOfWork ProofOfWork { get; set; }
 
-      
+
 
         public ICryptoUtil CryptoUtil { get; set; }
 
@@ -96,14 +97,12 @@ namespace Node.Domain
             if (block == null)
                 return;
 
-            block.BlockMined(nonce, hash, minerAddress);
-
-            // TODO validate nonce by calculating hash
-
-            if(!ProofOfWork.IsProofValid(block.Difficulty, block.Index, block.BlockDataHash, block.PreviousBlockHash, block.CreatedDate, nonce, hash))
+            if (!ProofOfWork.IsProofValid(block.Difficulty, block.Index, block.BlockDataHash, block.PreviousBlockHash, block.CreatedDate, nonce, hash))
             {
                 throw new Exception("Invalid proof of work");
             }
+
+            block.BlockMined(nonce, hash, minerAddress);
 
             foreach (var transaction in block.Transactions)
             {
@@ -111,8 +110,19 @@ namespace Node.Domain
                 transaction.TranserSuccessfull = balance >= transaction.Amount;
             }
 
+            int minedTransactionsCount = block.Transactions.Count;
+
+            List<Transaction> notMinedTxs = new List<Transaction>();
+            var allTx = PendingTransactions.ToList();
+
+            for (int i = minedTransactionsCount; i < allTx.Count; i++)
+                notMinedTxs.Add(allTx[i]);
+
+            PendingTransactions = new ConcurrentBag<Transaction>(notMinedTxs);
+
             var test = BlockChain.TryAdd(block.Index, block);
             BlocksInProgress[minerAddress] = null;
+
         }
 
         private decimal CalculateBalance(string address)
@@ -159,7 +169,7 @@ namespace Node.Domain
                 if (lastBlock.Index == blockInProgressForMiner.Index - 1)
                     hasNewerTransactions = PendingTransactions.Count > blockInProgressForMiner.Transactions.Count;
 
-                if(hasNewBlock || hasNewerTransactions)
+                if (hasNewBlock || hasNewerTransactions)
                 {
                     Block blockForMine = BuildBlock();
                     MiningContext context = BuildNewMinerJob(blockForMine);
@@ -187,7 +197,7 @@ namespace Node.Domain
         }
 
         private Block BuildBlock()
-        {            
+        {
             var lastBlock = BlockChain.Last().Value;
             Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockDataHash, Difficulty);
             //TODO: should transaction mney for the miner be explicitly included ?s
