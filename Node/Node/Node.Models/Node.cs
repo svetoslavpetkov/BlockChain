@@ -92,7 +92,7 @@ namespace Node.Domain
             if (block == null)
                 return;
 
-            block.BlockMined(nonce, hash);
+            block.BlockMined(nonce, hash, minerAddress);
 
             // TODO validate nonce by calculating hash
 
@@ -102,7 +102,7 @@ namespace Node.Domain
                 transaction.TranserSuccessfull = balance >= transaction.Amount;
             }
 
-            BlockChain.TryAdd(block.Index, block);
+            var test = BlockChain.TryAdd(block.Index, block);
             BlocksInProgress[minerAddress] = null;
         }
 
@@ -136,7 +136,7 @@ namespace Node.Domain
             {
                 Block blockForMine = BuildBlock();
                 MiningContext context = BuildNewMinerJob(blockForMine);
-                BlocksInProgress.TryAdd(minerAddress, blockForMine);
+                BlocksInProgress[minerAddress] = blockForMine;
 
                 return context;
             }
@@ -154,13 +154,13 @@ namespace Node.Domain
                 {
                     Block blockForMine = BuildBlock();
                     MiningContext context = BuildNewMinerJob(blockForMine);
-                    BlocksInProgress.TryAdd(minerAddress, blockForMine);
+                    BlocksInProgress[minerAddress] = blockForMine;
 
                     return context;
                 }
-            }
 
-            return null;
+                return BuildNewMinerJob(blockInProgressForMiner);
+            }
         }
 
         private MiningContext BuildNewMinerJob(Block blockForMine)
@@ -178,10 +178,10 @@ namespace Node.Domain
         }
 
         private Block BuildBlock()
-        {
+        {            
             var lastBlock = BlockChain.Last().Value;
             Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockDataHash, Difficulty);
-
+            //TODO: should transaction mney for the miner be explicitly included ?s
             return tempBlock;
         }
     }

@@ -38,10 +38,11 @@ namespace Node.Domain
             return hash;
         }
 
-        public void BlockMined(int nonce, string hash)
+        public void BlockMined(int nonce, string hash, string minerAddress)
         {
             Nonce = Nonce;
             BlockHash = hash;
+            MinedBy = minerAddress;
         }
 
         public static Block CreateGenesisBlock(int difficulty)
@@ -57,7 +58,7 @@ namespace Node.Domain
                 CreatedDate = DateTime.UtcNow,
                 Difficulty = difficulty,
                 PreviousBlockHash = string.Empty,
-                Index = 1,
+                Index = 0,
                 Nonce = 02313,
                 MinedBy = string.Empty,
             };

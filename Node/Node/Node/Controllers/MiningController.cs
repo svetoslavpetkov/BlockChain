@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Node.Domain;
+using Node.Domain.ApiModels;
 
 namespace Node.Controllers
 {
@@ -18,7 +19,7 @@ namespace Node.Controllers
             Node = node;
         }
 
-        [HttpGet("getBockForMine")]
+        [HttpGet("getBockForMine/{minerAddress}")]
         public IActionResult GetBlockForMine(string minerAddress)
         { 
             MiningContext context = Node.GetBlockForMine(minerAddress);
@@ -26,10 +27,10 @@ namespace Node.Controllers
             return Ok(context);
         }
 
-        [HttpPost]
-        public IActionResult NonceFound(string minerAddress, int nonce, string hash)
+        [HttpPost("noncefound")]
+        public IActionResult NonceFound([FromBody]BlockMinedApiModel blockMinedRequest)
         {
-            Node.NonceFound(minerAddress, nonce, hash);
+            Node.NonceFound(blockMinedRequest.MinerAddress, blockMinedRequest.Nonce, blockMinedRequest.Hash);
             return Ok();
         }
     }

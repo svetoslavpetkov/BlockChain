@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,33 +13,55 @@ namespace Miner
     {
         static void Main(string[] args)
         {
-            string minerAddress = "localhost:8080";
-
-            var input = Get<BlockInput>(minerAddress + "//getBlock");
-
-            Boolean blockFound = false;
-            UInt64 nonce = 0;
-            string timestamp = input.Item2.Timestamp.ToString("o");
-            string difficulty = new String('0', input.Item2.Difficulty) +
-                new String('9', 64 - input.Item2.Difficulty);
-
-            string precomputedData = input.Item2.BlockIndex.ToString()
-                + input.Item2.BlockHash
-                + input.Item2.PrevBlockHash;
-
-            string data;
-            string blockHash;
-            while (!blockFound && nonce < UInt32.MaxValue)
+            string minerAddress = "ohoboho13";
+            string nodeAddress = "http://localhost:5555";
+            TimeSpan timeLimit = new TimeSpan(0, 0, 5);
+            Stopwatch sw = Stopwatch.StartNew();
+            BlockInput input = Get<BlockInput>(nodeAddress + "/api/mining/getBockForMine/" + minerAddress);
+            while (true)
             {
-                data = precomputedData + timestamp + nonce.ToString();
-                blockHash = ByteArrayToHexString(Sha256(Encoding.UTF8.GetBytes(data)));
+                sw.Restart();
 
-                if (String.CompareOrdinal(blockHash, difficulty) < 0)
+                Boolean blockFound = false;
+                UInt64 nonce = 0;
+                string timestamp = input.Timestamp.ToString("o");
+                string difficulty = new String('0', input.Difficulty) +
+                    new String('9', 64 - input.Difficulty);
+
+                string precomputedData = input.BlockIndex.ToString()
+                    + input.BlockHash
+                    + input.PrevBlockHash;
+
+                Console.WriteLine($"New job started at : " + DateTime.Now + " for block index " + input.BlockIndex);
+
+
+                string data;
+                string blockHash;
+                while (!blockFound && nonce < UInt32.MaxValue)
                 {
+                    data = precomputedData + timestamp + nonce.ToString();
+                    blockHash = ByteArrayToHexString(Sha256(Encoding.UTF8.GetBytes(data)));
 
+                    if (String.CompareOrdinal(blockHash, difficulty) < 0)
+                    {
+                        MakePost(nodeAddress + "/api/mining/noncefound", new BlockMinedRequest { MinerAddress= minerAddress, Nonce = nonce, Hash =  blockHash });
+                        Console.WriteLine($"Block mined. Nonce: {nonce} , Hash: {blockHash}");
+                        blockFound = true;
+                    }
+
+                    if (blockFound || (nonce % 1000 == 0 && sw.Elapsed >= timeLimit))
+                    {
+                        sw.Restart();
+                        var requestedBlockToMine = Get<BlockInput>(nodeAddress + "/api/mining/getBockForMine/" + minerAddress);
+                        if (blockFound || (requestedBlockToMine.BlockHash != input.BlockHash && requestedBlockToMine.BlockIndex != input.BlockIndex))
+                        {
+                            input = requestedBlockToMine;
+                            break;
+                        }
+                    }
+                    nonce++;
                 }
             }
-
         }
 
 
@@ -63,29 +87,39 @@ namespace Miner
 
 
 
-        public static Tuple<HttpStatusCode, T> Get<T>(string url)
-        {
-            var statusCode = HttpStatusCode.RequestTimeout;
-
-            // Create a request to Node   
-            WebRequest request = WebRequest.Create(url);
-            request.Method = "GET";
-            request.Timeout = 3000;
-            request.ContentType = "application/json; charset=utf-8";
-            using (var response = request.GetResponse())
+        public static T Get<T>(string url)
+            where T: class
+        {            
+            using (HttpClient httpClient = new HttpClient())
             {
-                statusCode = ((HttpWebResponse)response).StatusCode;
+                //string postContent = JsonConvert.SerializeObject(postObject);
+                //svar content = new StringContent(postContent, Encoding.UTF8, "application/json");
+                var task = httpClient.GetAsync(url);
 
-                using (Stream dataStream = response.GetResponseStream())
+                var response = task.GetAwaiter().GetResult();
+                if (response.IsSuccessStatusCode)
                 {
-                    using (StreamReader reader = new StreamReader(dataStream))
-                    {
-                        string responseFromNode = reader.ReadToEnd();
-                        return new Tuple<HttpStatusCode, T>(statusCode, JsonConvert.DeserializeObject<T>(responseFromNode));
-                    }
+                    string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return JsonConvert.DeserializeObject<T>(json);                    
                 }
             }
-
+            return null;
         }
+
+
+
+        public static bool MakePost<T>(string url, T postObject)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                string postContent = JsonConvert.SerializeObject(postObject);
+                var content = new StringContent(postContent, Encoding.UTF8, "application/json");
+
+                var result = httpClient.PostAsync(url, content).GetAwaiter().GetResult();
+
+                return result.IsSuccessStatusCode;
+            }
+        }
+
     }
 }
