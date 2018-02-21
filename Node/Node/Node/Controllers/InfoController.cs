@@ -23,8 +23,8 @@ namespace Node.Controllers
         public IActionResult Get()
         {
             NodeInfoApiModel result = new NodeInfoApiModel() {
-                About = Node.About,
-                Name = Node.Name,
+                About = Node.NodeInfo.About,
+                Name = Node.NodeInfo.Name,
                 ConfirmedTransactions = Node.BlockChain.Select(b => b.Value.Transactions.Count).Sum(),
                 PendingTransactions = Node.PendingTransactions.Count,
                 Difficulty = Node.Difficulty,

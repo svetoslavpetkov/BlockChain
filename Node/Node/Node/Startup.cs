@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using BlockChain.Core;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,12 @@ namespace Node
                     .AllowAnyHeader()
                     );
             });
+
+            services.AddSingleton<ICryptoUtil, CryptoUtil>();
+            services.AddSingleton<IProofOfWork, ProofOfWork>();
+            services.AddSingleton<ITransactionValidator, TransactionValidator>();
+            
+            services.AddSingleton<Domain.INodeSynchornizator,Domain.NodeSynchornizator>();
             services.AddSingleton<Domain.Node>();
         }
 

@@ -24,10 +24,14 @@ namespace Node.Domain
 
         public ICryptoUtil CryptoUtil { get; set; }
 
-        public ulong BlockReward { get {
+        public ulong BlockReward
+        {
+            get
+            {
                 ulong txFees = Transactions.Aggregate((ulong)0, (total, next) => total += next.Fee);
                 return 5 * Token.OneToken + txFees;
-            } }
+            }
+        }
 
         public Block()
         {

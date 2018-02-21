@@ -75,10 +75,10 @@ namespace Node.Controllers
             return Ok(result);
         }
 
-        [HttpGet("/new/{index:int}/{peer}")]
-        public void NewBlockFound(int index, string peer)
+        [HttpPost("/new")]
+        public void NewBlockFound(Block block)
         {
-            //new block foudn by peer
+
         }
 
         [HttpGet("balance/{address}")]

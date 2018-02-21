@@ -10,9 +10,7 @@ namespace Node.Domain
 {
     public class Node
     {
-        public Guid Identifier { get; set; } = new Guid();
-        public string Name { get; private set; }
-        public string About { get; private set; }
+        public NodeInfo NodeInfo { get; private set; }
 
         public DateTime Started { get; set; }
 
@@ -22,19 +20,17 @@ namespace Node.Domain
         public int Difficulty { get; private set; }
         private ConcurrentDictionary<string, Block> BlocksInProgress { get; set; }
 
-        public TransactionValidator TransactionValidator { get; set; }
-
-
+        public ITransactionValidator TransactionValidator { get; set; }
+        private INodeSynchornizator NodeSynchornizator { get; set; }
         private IProofOfWork ProofOfWork { get; set; }
 
-
-
         public ICryptoUtil CryptoUtil { get; set; }
-
         public ConcurrentBag<Peer> Peers { get; private set; }
 
-        public Node()
+        public Node(INodeSynchornizator nodeSynchornizator, IProofOfWork proofOfWork,
+            ICryptoUtil cryptoUtil, ITransactionValidator transactionValidator)
         {
+            NodeInfo = new NodeInfo();
             BlockChain = new ConcurrentDictionary<int, Block>();
             PendingTransactions = new ConcurrentBag<Transaction>();
             MiningJobs = new ConcurrentDictionary<string, Block>();
@@ -42,12 +38,14 @@ namespace Node.Domain
             Difficulty = 5;
             BlocksInProgress = new ConcurrentDictionary<string, Block>();
 
+            NodeSynchornizator = nodeSynchornizator;
+            TransactionValidator = transactionValidator;
+            CryptoUtil = cryptoUtil;
+            ProofOfWork = proofOfWork;
+
             Block genesisBlock = Block.CreateGenesisBlock(Difficulty);
             BlockChain.TryAdd(0, genesisBlock);
 
-            TransactionValidator = new TransactionValidator();
-            CryptoUtil = new CryptoUtil();
-            ProofOfWork = new ProofOfWork();
             Started = DateTime.Now;
         }
 
@@ -91,7 +89,7 @@ namespace Node.Domain
                 throw new TransactionNotValidException("Provided address is not valid.");
 
             PendingTransactions.Add(transaction);
-            BroadcastToPeers(transaction);
+            NodeSynchornizator.BroadcastTransaction(transaction);
         }
 
         public void NonceFound(string minerAddress, int nonce, string hash)
@@ -100,10 +98,7 @@ namespace Node.Domain
             if (block == null)
                 return;
 
-            if (!ProofOfWork.IsProofValid(block.Difficulty, block.Index, block.BlockDataHash, block.PreviousBlockHash, block.CreatedDate, nonce, hash))
-            {
-                throw new Exception("Invalid proof of work");
-            }
+            ValidateBlockHash(block);
 
             block.BlockMined(nonce, hash, minerAddress);
 
@@ -128,9 +123,17 @@ namespace Node.Domain
 
         }
 
+        private void ValidateBlockHash(Block block)
+        {
+            if (!ProofOfWork.IsProofValid(block.Difficulty, block.Index, block.BlockDataHash, block.PreviousBlockHash, block.CreatedDate, nonce, hash))
+            {
+                throw new Exception("Invalid proof of work");
+            }
+        }
+
         private ulong CalculateBalance(string address)
         {
-            //Get pur transaction balances
+            //Get transaction balances
             var addressTransactions = GetTransactions(address);
             ulong balance = 0;
             foreach (var tx in addressTransactions)
@@ -165,11 +168,6 @@ namespace Node.Domain
             }
 
             return result;
-        }
-
-        private void BroadcastToPeers(Core.Transaction tx)
-        {
-            //TODO
         }
 
         public MiningContext GetBlockForMine(string minerAddress)
@@ -228,6 +226,11 @@ namespace Node.Domain
             Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockDataHash, Difficulty);
             //TODO: should transaction mney for the miner be explicitly included ?s
             return tempBlock;
+        }
+
+        public void AttachBroadcastedBlcok(Block minedBlock)
+        {
+           
         }
     }
 }
