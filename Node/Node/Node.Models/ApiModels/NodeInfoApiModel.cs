@@ -16,5 +16,7 @@ namespace Node.Domain.ApiModels
         public int ConfirmedTransactions { get; set; }
 
         public int PendingTransactions { get; set; }
+
+        public DateTime Started { get; set; }
     }
 }

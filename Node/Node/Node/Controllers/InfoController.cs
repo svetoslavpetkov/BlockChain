@@ -20,7 +20,7 @@ namespace Node.Controllers
 
 
         [HttpGet]
-        public NodeInfoApiModel Get()
+        public IActionResult Get()
         {
             NodeInfoApiModel result = new NodeInfoApiModel() {
                 About = Node.About,
@@ -28,12 +28,11 @@ namespace Node.Controllers
                 ConfirmedTransactions = Node.BlockChain.Select(b => b.Value.Transactions.Count).Sum(),
                 PendingTransactions = Node.PendingTransactions.Count,
                 Difficulty = Node.Difficulty,
-                Peers = Node.Peers.Count
+                Peers = Node.Peers.Count,
+                Started = Node.Started
             };
-
             
-
-            return result;
+            return Ok(result);
         }
     }
 }

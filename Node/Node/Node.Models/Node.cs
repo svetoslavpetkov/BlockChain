@@ -14,6 +14,8 @@ namespace Node.Domain
         public string Name { get; private set; }
         public string About { get; private set; }
 
+        public DateTime Started { get; set; }
+
         public ConcurrentDictionary<int, Block> BlockChain { get; private set; }
         public ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
         public ConcurrentDictionary<string, Block> MiningJobs { get; private set; }
@@ -46,6 +48,7 @@ namespace Node.Domain
             TransactionValidator = new TransactionValidator();
             CryptoUtil = new CryptoUtil();
             ProofOfWork = new ProofOfWork();
+            Started = DateTime.Now;
         }
 
         public ulong GetBalance(string address)
@@ -127,18 +130,29 @@ namespace Node.Domain
 
         private ulong CalculateBalance(string address)
         {
+            //Get pur transaction balances
             var addressTransactions = GetTransactions(address);
             ulong balance = 0;
             foreach (var tx in addressTransactions)
             {
                 if (tx.FromAddress == address)
+                {
                     balance -= tx.Amount;
+                    balance -= tx.Fee;
+                }
 
                 if (tx.ToAddress == address)
                     balance += tx.Amount;
             }
 
-            return balance;
+            //if address is miner winner
+
+            ulong minedBlokcs = BlockChain
+                .Where(b => b.Value.MinedBy == address)
+                .ToList()
+                .Aggregate((ulong)0, (total, nextBlock) => total += nextBlock.Value.BlockReward);
+
+            return balance + minedBlokcs;
         }
 
         public ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)

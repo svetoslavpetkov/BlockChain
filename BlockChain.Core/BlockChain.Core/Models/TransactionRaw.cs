@@ -10,5 +10,7 @@ namespace BlockChain.Core
 
         public ulong Fee { get { return 100000; }  }
         public DateTime DateCreated { get; set; }
+
+        public string Comment { get; set; }
     }
 }

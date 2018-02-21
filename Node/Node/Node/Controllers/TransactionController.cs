@@ -8,6 +8,7 @@ using Node.Domain.ApiModels;
 
 namespace Node.Controllers
 {
+    [Produces("application/json")]
     [Route("api/transaction")]
     public class TransactionController : Controller
     {

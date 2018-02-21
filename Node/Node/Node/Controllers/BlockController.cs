@@ -66,8 +66,9 @@ namespace Node.Controllers
                 return NotFound($"Block with index {toIndnex} is not existing");
             }
 
+            //Itterate backwards
             List<Domain.ApiModels.BlockApiModel> result = new List<Domain.ApiModels.BlockApiModel>();
-            for (uint i = fromIndex; i <= toIndnex; i++)
+            for (uint i = toIndnex; i >=  fromIndex; i--)
             {
                 result.Add(Domain.ApiModels.BlockApiModel.FromBlock(Node.BlockChain[(int)i]));
             }

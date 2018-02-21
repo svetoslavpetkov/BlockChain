@@ -5,9 +5,13 @@ namespace Node.Domain
     {
         public string Url { get; private set; }
 
-        public Peer(string url)
+        public string Name { get; private set; }
+
+
+        public Peer(string url, string name)
         {
             Url = url;
+            Name = name;
         }
     }
 }

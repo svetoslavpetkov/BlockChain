@@ -25,12 +25,13 @@ namespace Node.Controllers
             return Ok(balance);
         }
 
-        [HttpGet("{address}/transactions")]
-        public IActionResult GetTransactions(string address)
+        [HttpGet("{address}/latesttransactions/{count}")]
+        public IActionResult GetTransactions(string address, int count)
         {
             return Ok(Node.GetTransactions(address, true)
                         .Select( tx => GetTransactionApiModel.FromTransaction(tx))
                         .OrderByDescending(tx => tx.DateCreated)
+                        .Take(count)
                         .ToList());
         }
     }

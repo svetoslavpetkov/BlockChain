@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using BlockChain.Core;
 
 namespace Node.Domain.ApiModels
 {
@@ -23,6 +24,8 @@ namespace Node.Domain.ApiModels
 
         public int TransactionsCount { get; set; }
 
+        public string BlockReward { get; set;  }
+
 
         public static BlockApiModel FromBlock(Block block)
         {
@@ -36,7 +39,8 @@ namespace Node.Domain.ApiModels
                 MinedBy = block.MinedBy,
                 Nonce = block.Nonce,
                 PreviousBlockHash = block.PreviousBlockHash,
-                TransactionsCount = block.Transactions.Count
+                TransactionsCount = block.Transactions.Count,
+                BlockReward = block.BlockReward.GetFormattedTokens()
             };
         }
     }
