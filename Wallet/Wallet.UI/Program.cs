@@ -60,8 +60,22 @@ namespace Wallet.UI
             ITransactionValidator nodeSimulator = new TransactionValidator();
             bool isValid =  nodeSimulator.IsValid(tran);
 
+            string path = "C:\\Users\\svetoslav.petkov\\Source\\Repos\\BlockChain\\Wallet\\Wallet.UI\\Wallet.json";
+            string pass = "12345_qwe";
 
+            //FullWallet.GenerateNewWallet(path, pass);
 
+            var fullWallet = new FullWallet(path, pass);
+            var accounts = fullWallet.GetAccounts();
+
+            tran = accounts[0].Sign("asfasdfasdfasdfdasasdffasdsd", 5000000);
+            isValid = nodeSimulator.IsValid(tran);
+
+            tran = accounts[1].Sign("asfasdfasdfasdasfasddfdasasdffasdsd", 1000);
+            isValid = nodeSimulator.IsValid(tran);
+
+            tran = accounts[2].Sign("asfasdfasdfasdasfasddfdasasdffasdsd", 1000);
+            isValid = nodeSimulator.IsValid(tran);
         }
 
 

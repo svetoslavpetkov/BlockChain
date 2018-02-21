@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HBitcoin" Version="0.1.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\BlockChain.Core\BlockChain.Core\BlockChain.Core.csproj" />
   </ItemGroup>
 

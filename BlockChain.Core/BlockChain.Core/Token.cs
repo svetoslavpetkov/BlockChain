@@ -28,5 +28,20 @@ namespace BlockChain.Core
         {
             return GetFormatted(tokens);
         }
+
+        public static ulong ConvertToTokens(string value)
+        {
+            string[] parts = value.Split(DecimalDelimeter);
+
+            ulong wholeTokens = ulong.Parse(parts[0]) * OneToken;
+            ulong fractionPart = ulong.Parse(parts[1].PadRight(9, '0'));
+
+            return wholeTokens + fractionPart;
+        }
+
+        public static ulong ToTokens(this string value)
+        {
+            return ConvertToTokens(value);
+        }
     }
 }

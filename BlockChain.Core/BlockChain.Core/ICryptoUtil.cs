@@ -18,5 +18,7 @@ namespace BlockChain.Core
         string GetPublicKeyCompressed(string privateKeyString);
 
         string RecoverPrivateKey(string seed);
+
+        string GetHexString(byte[] bytes);
     }
 }
