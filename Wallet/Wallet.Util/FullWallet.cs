@@ -24,10 +24,14 @@ namespace Wallet.Util
 
         private Safe _safe;
 
+        public string Name { get; set; }
 
-        public FullWallet(string jsonFilePath, string password)
+
+        public FullWallet(string name,string jsonFilePath, string password)
         {
             _safe = Safe.Load(password, jsonFilePath);
+
+            Name = name;
         }
 
         public IList<SimpleWallet> GetAccounts()
@@ -37,11 +41,7 @@ namespace Wallet.Util
             for (int i = 0; i < 10; i++)
             {
                 var bitAdress = _safe.GetAddress(i);
-
                 var extKEy =_safe.ExtKey.Derive(KeyPath.Parse("/44'/60'/0'/0"));
-
-                var privKey = _safe.FindPrivateKey(bitAdress);
-
                 simpleWallets.Add(new SimpleWallet(extKEy.ToBytes()));
             }
 

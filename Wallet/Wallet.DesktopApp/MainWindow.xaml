@@ -5,18 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wallet.DesktopApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="484.112" Width="701.636">
+        Title="MainWindow" Height="627.112" Width="696.636">
     <Grid>
         <Label Content="MyWallet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="36"/>
-        <Label Content="Address" HorizontalAlignment="Left" Margin="10,98,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <Label Content="Ballance" HorizontalAlignment="Left" Margin="10,160,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <Label x:Name="ballace" Content="0 coins" HorizontalAlignment="Left" Margin="119,160,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <TextBox x:Name="ownAddress" HorizontalAlignment="Left" Height="37" Margin="119,103,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
-        <Label Content="SendTo" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <TextBox x:Name="remoteAddress" HorizontalAlignment="Left" Height="37" Margin="119,238,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
-        <Button x:Name="btnSend" Content="Send $$$" HorizontalAlignment="Left" Margin="544,356,0,0" VerticalAlignment="Top" Width="122" FontSize="20" Height="41" Click="Button_Click"/>
-        <Label Content="Amount" HorizontalAlignment="Left" Margin="10,300,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <TextBox x:Name="amount" HorizontalAlignment="Left" Height="37" Margin="119,305,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
+        <Label Content="Address" HorizontalAlignment="Left" Margin="15,161,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label Content="Ballance" HorizontalAlignment="Left" Margin="15,223,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label x:Name="ballace" Content="0 coins" HorizontalAlignment="Left" Margin="124,223,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label Content="SendTo" HorizontalAlignment="Left" Margin="15,296,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox x:Name="remoteAddress" HorizontalAlignment="Left" Height="37" Margin="124,301,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
+        <Button x:Name="btnSend" Content="Send $$$" HorizontalAlignment="Left" Margin="549,419,0,0" VerticalAlignment="Top" Width="122" FontSize="20" Height="41" Click="Button_Click"/>
+        <Label Content="Amount" HorizontalAlignment="Left" Margin="15,363,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox x:Name="amount" HorizontalAlignment="Left" Height="37" Margin="124,368,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" FontSize="22"/>
         <Label x:Name="result" Content="result" HorizontalAlignment="Left" Margin="54,366,0,0" Visibility="Hidden" VerticalAlignment="Top" FontSize="24" Width="436"/>
+        <Label Name="WalletName" Content="MyWallet" HorizontalAlignment="Left" Margin="200,10,0,0" VerticalAlignment="Top" FontSize="36"/>
+        <ComboBox ItemsSource="{Binding Path=Addresses}" HorizontalAlignment="Left" Margin="138,167,0,0" VerticalAlignment="Top" Width="533" Height="33" FontSize="22"/>
+        <Label Content="Total ballance" HorizontalAlignment="Left" Margin="15,86,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <Label Name="TotalBallance" Content="0 coins" HorizontalAlignment="Left" Margin="174,86,0,0" VerticalAlignment="Top" FontSize="24"/>
     </Grid>
 </Window>

@@ -65,7 +65,7 @@ namespace Wallet.UI
 
             //FullWallet.GenerateNewWallet(path, pass);
 
-            var fullWallet = new FullWallet(path, pass);
+            var fullWallet = new FullWallet("name",path, pass);
             var accounts = fullWallet.GetAccounts();
 
             tran = accounts[0].Sign("asfasdfasdfasdfdasasdffasdsd", 5000000);

@@ -11,6 +11,20 @@ namespace Wallet.Util
 
         public string PrivateKey { get; set; }
 
+
+        private string _address = null;
+        public string Address
+        {
+            get
+            {
+                if (_address == null)
+                {
+                    _address = GetAddress();
+                }
+                return _address;
+            }
+        }
+
         public SimpleWallet(byte[] privateKey)
         {
             PrivateKey = CryptoUtil.GetHexString(privateKey);

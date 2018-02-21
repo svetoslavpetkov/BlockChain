@@ -7,10 +7,12 @@
         mc:Ignorable="d"
         Title="Login" Height="459.401" Width="567.302">
     <Grid>
-        <Label Content="Mnemonic" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top" Width="140" FontSize="24"/>
-        <Label Content="Password" HorizontalAlignment="Left" Margin="10,254,0,0" VerticalAlignment="Top" Width="140" FontSize="24"/>
-        <PasswordBox x:Name="password" HorizontalAlignment="Left" PasswordChar="$" Margin="10,319,0,0" VerticalAlignment="Top" Width="509" FontSize="24" Height="39"/>
-        <TextBox x:Name="mnemonic" HorizontalAlignment="Left" Height="118" Margin="10,136,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="531"/>
-        <Button Content="Login" HorizontalAlignment="Left" Margin="388,374,0,0" VerticalAlignment="Top" Width="131" Height="44" Click="Button_Click" FontSize="22" Background="#FF979797"/>
+        <Label Content="Wallets" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top" Width="140" FontSize="24"/>
+        <Label Content="Password" HorizontalAlignment="Left" Margin="10,137,0,0" VerticalAlignment="Top" Width="140" FontSize="24"/>
+        <PasswordBox x:Name="password" HorizontalAlignment="Left" PasswordChar="$" Margin="150,140,0,0" VerticalAlignment="Top" Width="381" FontSize="24" Height="39"/>
+        <Button Content="Login" HorizontalAlignment="Left" Margin="400,228,0,0" VerticalAlignment="Top" Width="131" Height="44" Click="Button_Click" FontSize="22" Background="#FF02570E" Foreground="White"/>
+        <ComboBox x:Name="cboWallets" HorizontalAlignment="Left" Margin="150,81,0,0" VerticalAlignment="Top" Width="381" Height="34"/>
+        <Button Name="CreateNew" Content="Create new" HorizontalAlignment="Left" Margin="236,228,0,0" VerticalAlignment="Top" Width="131" Height="44" FontSize="22" Background="#FF979797" Click="CreateNew_Click"/>
+        <Button Content="Recover" HorizontalAlignment="Left" Margin="72,228,0,0" VerticalAlignment="Top" Width="131" Height="44" Click="Button_Click" FontSize="22" Background="#FF979797"/>
     </Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,20 +20,40 @@ namespace Wallet.DesktopApp
     /// </summary>
     public partial class Login : Window
     {
+        IWalletStorage walletStorage = new WalletStorage();
+
+        public ObservableCollection<ComboBoxItem> cbItems { get; set; }
+        public ComboBoxItem SelectedcbItem { get; set; }
+
+        public string Password { get; set; }
+
         public Login()
         {
+            cbItems = new ObservableCollection<ComboBoxItem>();
+
             InitializeComponent();
+
+            var wallets = walletStorage.GetWallets();
+
+            foreach (var wallet in wallets)
+            {
+                cbItems.Add(new ComboBoxItem() { Content = wallet });
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string mnemonic = this.mnemonic.Text;
-            string password = this.password.Password;
-
-
-            MainWindow mainWindow = new MainWindow(Util.SimpleWallet.GenerateNewWallet(mnemonic, password));
-            mainWindow.Show();
+            //MainWindow mainWindow = new MainWindow(Util.SimpleWallet.GenerateNewWallet(mnemonic, password));
+            //mainWindow.Show();
             this.Close();
+        }
+
+        private void CreateNew_Click(object sender, RoutedEventArgs e)
+        {
+            Wallet.DesktopApp.CreateNew createNewWindow = new DesktopApp.CreateNew();
+            createNewWindow.Show();
+            this.Close();
+
         }
     }
 }
