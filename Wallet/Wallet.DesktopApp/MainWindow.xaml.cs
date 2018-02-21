@@ -43,7 +43,7 @@ namespace Wallet.DesktopApp
         private decimal GetBalance()
         {
             decimal balance = 0;
-            balance = Get<decimal>($"http://localhost:5555/api/block/balance/{address}");
+            balance = Get<decimal>($"http://localhost:5555/api/account/{address}/ballance");
 
             return balance;
         }
@@ -52,7 +52,7 @@ namespace Wallet.DesktopApp
         {
             string from = this.ownAddress.Text;
             string to = this.remoteAddress.Text;
-            decimal amount = decimal.Parse(this.amount.Text);
+            ulong amount = ulong.Parse(this.amount.Text);
 
             var transaction = Wallet.Sign(to, amount);
 

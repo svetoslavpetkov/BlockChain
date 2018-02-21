@@ -15,7 +15,7 @@ namespace Wallet.Util
             PrivateKey = privateKey;
         }
 
-        public Transaction Sign(string recipientAddress, decimal value)
+        public Transaction Sign(string recipientAddress, ulong value)
         {
             DateTime signDate = DateTime.Now;
             Transaction signedTransaction = Signer.Sign(PrivateKey, recipientAddress, value, signDate);

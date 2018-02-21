@@ -9,7 +9,7 @@ namespace BlockChain.Core
 {
     public class TransactionSigner : CryptographyBase, ITransactionSigner
     {
-        public Transaction Sign(string privateKey, string recipientAddress, decimal amount, DateTime signDate)
+        public Transaction Sign(string privateKey, string recipientAddress, ulong amount, DateTime signDate)
         {
             BigInteger hexPrivateKey = new BigInteger(privateKey, 16);
             string publicKey = CryptoUtil.GetPublicKeyCompressed(privateKey);

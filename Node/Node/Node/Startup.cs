@@ -37,6 +37,8 @@ namespace Node
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("CorsPolicy");
+
             app.UseMvc();
         }
     }

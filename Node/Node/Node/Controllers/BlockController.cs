@@ -26,11 +26,52 @@ namespace Node.Controllers
 
             if (success)
             {
-                return Ok(result);
+                return Ok(Domain.ApiModels.BlockApiModel.FromBlock(result));
             }
 
             return NotFound($"Block with index {index} is not found");
+        }
 
+
+        [HttpGet("{index}/transactions")]
+        public IActionResult GetBlockTransactions(int index)
+        {
+            Block result;
+            bool success = Node.BlockChain.TryGetValue(index, out result);
+
+            if (success)
+            {
+                return Ok(result
+                            .Transactions
+                            .Select(tx=> Domain.ApiModels.GetTransactionApiModel.FromTransaction(tx))
+                            .ToList());
+            }
+
+            return NotFound($"Block with index {index} is not found");
+        }
+
+        [HttpGet("last")]
+        public IActionResult GetLastBlock()
+        {
+            return Ok(Domain.ApiModels.BlockApiModel.FromBlock(Node.BlockChain[Node.BlockChain.Count - 1]));
+        }
+
+        [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
+        public IActionResult GetBlocks(uint fromIndex, uint count)
+        {
+            uint toIndnex = fromIndex + count - 1;
+
+            if (toIndnex >= Node.BlockChain.Count)
+            {
+                return NotFound($"Block with index {toIndnex} is not existing");
+            }
+
+            List<Domain.ApiModels.BlockApiModel> result = new List<Domain.ApiModels.BlockApiModel>();
+            for (uint i = fromIndex; i <= toIndnex; i++)
+            {
+                result.Add(Domain.ApiModels.BlockApiModel.FromBlock(Node.BlockChain[(int)i]));
+            }
+            return Ok(result);
         }
 
         [HttpGet("/new/{index:int}/{peer}")]
@@ -45,5 +86,8 @@ namespace Node.Controllers
             decimal balance = Node.GetBalance(address);
             return Ok(balance);
         }
+
+
+
     }
 }

@@ -48,9 +48,9 @@ namespace Node.Domain
             ProofOfWork = new ProofOfWork();
         }
 
-        public decimal GetBalance(string address)
+        public ulong GetBalance(string address)
         {
-            decimal balance = CalculateBalance(address);
+            ulong balance = CalculateBalance(address);
             return balance;
         }
 
@@ -125,10 +125,10 @@ namespace Node.Domain
 
         }
 
-        private decimal CalculateBalance(string address)
+        private ulong CalculateBalance(string address)
         {
-            var addressTransactions = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
-            decimal balance = 0;
+            var addressTransactions = GetTransactions(address);
+            ulong balance = 0;
             foreach (var tx in addressTransactions)
             {
                 if (tx.FromAddress == address)
@@ -139,6 +139,18 @@ namespace Node.Domain
             }
 
             return balance;
+        }
+
+        public ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)
+        {
+            var result = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
+
+            if (includeUncofirmed)
+            {
+                result.AddRange(PendingTransactions.Where(t => t.FromAddress == address || t.ToAddress == address).ToList());
+            }
+
+            return result;
         }
 
         private void BroadcastToPeers(Core.Transaction tx)
