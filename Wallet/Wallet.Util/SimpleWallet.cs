@@ -1,5 +1,6 @@
 ﻿using BlockChain.Core;
 using System;
+using System.Linq;
 
 namespace Wallet.Util
 {
@@ -9,6 +10,25 @@ namespace Wallet.Util
         private ICryptoUtil CryptoUtil = new CryptoUtil();
 
         public string PrivateKey { get; set; }
+
+
+        private string _address = null;
+        public string Address
+        {
+            get
+            {
+                if (_address == null)
+                {
+                    _address = GetAddress();
+                }
+                return _address;
+            }
+        }
+
+        public SimpleWallet(byte[] privateKey)
+        {
+            PrivateKey = CryptoUtil.GetHexString(privateKey);
+        }
 
         public SimpleWallet(string privateKey)
         {

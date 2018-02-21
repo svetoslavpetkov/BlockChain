@@ -82,6 +82,12 @@ namespace BlockChain.Core
         }
 
 
+        public string GetHexString(byte[] bytes)
+        {
+            BigInteger bi = new BigInteger(bytes);
+            return bi.ToString(16);
+        }
+
 
 
         public string GetPublicKeyCompressed(string privateKeyString)

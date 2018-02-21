@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BlockChain.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,36 +26,54 @@ namespace Wallet.DesktopApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SimpleWallet Wallet = null;
+        private FullWallet Wallet = null;
         private string address;
 
-        public MainWindow(SimpleWallet wallet)
+        public List<string> Addresses { get; set; } = new List<string>();
+
+        public MainWindow(FullWallet wallet)
         {
-            InitializeComponent();
             Wallet = wallet;
-            address = wallet.GetAddress();
-            this.ownAddress.Text = address;
+            Addresses.AddRange(wallet.GetAccounts().Select(a => a.Address));
 
-            this.ballace.Content = $"{GetBalance()} coins";
+            InitializeComponent();
 
-            this.ownAddress.Text = wallet.GetAddress();
+            //this.ownAddress.Text = address;
+            RecalcualteTotalBallance();
+
+            //this.ownAddress.Text = wallet.GetAddress();
         }
 
-        private decimal GetBalance()
+        private void RecalcualteTotalBallance()
         {
-            decimal balance = 0;
-            balance = Get<decimal>($"http://localhost:5555/api/account/{address}/ballance");
+            ulong totalBallance = 0;
+            foreach (var address in Addresses)
+            {
+                totalBallance += GetBalance(address);
+                this.TotalBallance.Content = $"{totalBallance.GetFormattedTokens() } coins";
+            }
+        }
+
+        private void RecalcualteBallance()
+        {
+
+        }
+
+        private ulong GetBalance(string address)
+        {
+            ulong balance = 0;
+            balance = Get<ulong>($"http://localhost:5555/api/account/{address}/ballance");
 
             return balance;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string from = this.ownAddress.Text;
+            string from = "";
             string to = this.remoteAddress.Text;
             ulong amount = ulong.Parse(this.amount.Text);
 
-            var transaction = Wallet.Sign(to, amount);
+            var transaction =  Wallet.GetAccounts().Where(a => a.GetAddress() == "").First().Sign(to, amount);
 
             this.result.Content = "Sending transaction ....";
             this.result.Visibility = Visibility.Visible;

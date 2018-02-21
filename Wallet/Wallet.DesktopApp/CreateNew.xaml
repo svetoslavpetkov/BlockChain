@@ -1,0 +1,21 @@
+﻿<Window x:Class="Wallet.DesktopApp.CreateNew"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wallet.DesktopApp"
+        mc:Ignorable="d"
+        Title="CreateNew" Height="412.707" Width="567.68">
+    <Grid>
+        <Label Content="Wallet name" HorizontalAlignment="Left" Margin="18,26,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox Name="WalletName" HorizontalAlignment="Left" Height="36" Text="{Binding Path=WalletName}" Margin="193,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="329" FontSize="24"/>
+        <Label Content="Password" HorizontalAlignment="Left" Margin="18,84,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <PasswordBox x:Name="passwordBox" PasswordChar="$" HorizontalAlignment="Left" Margin="193,84,0,0" VerticalAlignment="Top" Width="329" Height="35" FontSize="22"/>
+        <Button Name="Generate" Content="Generate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="153" Margin="369,137,0,0" Height="51" Background="#FF006417" Foreground="#FFFFF6F6" FontSize="22" Click="Generate_Click"/>
+        <Label Content="Error message" Visibility="Hidden" HorizontalAlignment="Left" Margin="18,193,0,0" VerticalAlignment="Top" Foreground="#FF7E0000" FontSize="22"/>
+        <Label Content="Success message" Visibility="Hidden" HorizontalAlignment="Left" Margin="18,193,0,0" VerticalAlignment="Top" Foreground="#FF02D40B" FontSize="22"/>
+        <Label Content="Mnemonic" HorizontalAlignment="Left" Margin="24,201,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <TextBox Name="Mnemonic" IsEnabled="False" HorizontalAlignment="Left" Height="75" Margin="24,243,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="498"/>
+        <Button x:Name="OpenWallet" Visibility="Hidden" Content="Open wallet" HorizontalAlignment="Left" VerticalAlignment="Top" Width="153" Margin="369,323,0,0" Height="51" Background="#FF006417" Foreground="#FFFFF6F6" FontSize="22" Click="OpenWallet_Click" />
+    </Grid>
+</Window>

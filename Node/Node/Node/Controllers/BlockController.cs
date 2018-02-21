@@ -59,16 +59,16 @@ namespace Node.Controllers
         [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
         public IActionResult GetBlocks(uint fromIndex, uint count)
         {
-            uint toIndnex = fromIndex + count - 1;
+            int to = from - (int)count;
 
-            if (toIndnex >= Node.BlockChain.Count)
+            if (from < 0)
             {
-                return NotFound($"Block with index {toIndnex} is not existing");
+                return NotFound($"Blocks starting from index {from} are not existing");
             }
 
             //Itterate backwards
             List<Domain.ApiModels.BlockApiModel> result = new List<Domain.ApiModels.BlockApiModel>();
-            for (uint i = toIndnex; i >=  fromIndex; i--)
+            for (int i = from; i > to; i--)
             {
                 result.Add(Domain.ApiModels.BlockApiModel.FromBlock(Node.BlockChain[(int)i]));
             }
