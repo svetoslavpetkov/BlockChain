@@ -11,9 +11,7 @@ namespace Node.Domain
     public class Node
     {
         public NodeInfo NodeInfo { get; private set; }
-
         public DateTime Started { get; set; }
-
         public ConcurrentDictionary<int, Block> BlockChain { get; private set; }
         public ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
         public ConcurrentDictionary<string, Block> MiningJobs { get; private set; }
@@ -23,14 +21,13 @@ namespace Node.Domain
         public ITransactionValidator TransactionValidator { get; set; }
         private INodeSynchornizator NodeSynchornizator { get; set; }
         private IProofOfWork ProofOfWork { get; set; }
-
         public ICryptoUtil CryptoUtil { get; set; }
         public ConcurrentBag<Peer> Peers { get; private set; }
 
         public Node(INodeSynchornizator nodeSynchornizator, IProofOfWork proofOfWork,
-            ICryptoUtil cryptoUtil, ITransactionValidator transactionValidator)
+            ICryptoUtil cryptoUtil, ITransactionValidator transactionValidator, NodeInfo nodeInfo)
         {
-            NodeInfo = new NodeInfo();
+            NodeInfo = nodeInfo;
             BlockChain = new ConcurrentDictionary<int, Block>();
             PendingTransactions = new ConcurrentBag<Transaction>();
             MiningJobs = new ConcurrentDictionary<string, Block>();
@@ -98,7 +95,7 @@ namespace Node.Domain
             if (block == null)
                 return;
 
-            ValidateBlockHash(block);
+            ValidateBlockHash(block, nonce, hash);
 
             block.BlockMined(nonce, hash, minerAddress);
 
@@ -123,7 +120,7 @@ namespace Node.Domain
 
         }
 
-        private void ValidateBlockHash(Block block)
+        private void ValidateBlockHash(Block block, int nonce, string hash)
         {
             if (!ProofOfWork.IsProofValid(block.Difficulty, block.Index, block.BlockDataHash, block.PreviousBlockHash, block.CreatedDate, nonce, hash))
             {
@@ -230,7 +227,17 @@ namespace Node.Domain
 
         public void AttachBroadcastedBlcok(Block minedBlock)
         {
-           
+            ValidateBlockHash(minedBlock,minedBlock.Nonce, minedBlock.BlockHash);
+
+            Block last = BlockChain.Last().Value;
+            if (minedBlock.Index <= last.Index)
+                return;
+
+            // remove mined transactions from pending transactions
+            List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();
+            PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.Where(t => !minedTxIds.Contains(t.TransactionHash)).ToList());
+
+            BlockChain.TryAdd(minedBlock.Index, minedBlock);
         }
     }
 }

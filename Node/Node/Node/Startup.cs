@@ -19,7 +19,8 @@ namespace Node
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddCors(options => {
+            services.AddCors(options =>
+            {
                 options.AddPolicy("CorsPolicy",
                     builder => builder
                     .AllowAnyOrigin()
@@ -27,12 +28,16 @@ namespace Node
                     .AllowAnyHeader()
                     );
             });
+            services.AddSingleton<Domain.NodeInfo>();
 
             services.AddSingleton<ICryptoUtil, CryptoUtil>();
             services.AddSingleton<IProofOfWork, ProofOfWork>();
             services.AddSingleton<ITransactionValidator, TransactionValidator>();
-            
-            services.AddSingleton<Domain.INodeSynchornizator,Domain.NodeSynchornizator>();
+
+            services.AddSingleton<Domain.INodeSynchornizator>(s =>
+            {
+                return new Domain.NodeSynchornizator(new Domain.Peer("http://localhost:5555", s.GetService<Domain.NodeInfo>().Name));
+            });
             services.AddSingleton<Domain.Node>();
         }
 

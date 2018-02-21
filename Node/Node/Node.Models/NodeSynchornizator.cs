@@ -10,6 +10,8 @@ namespace Node.Domain
         List<Block> Sync();
         void BroadcastTransaction(Transaction tx);
         void BroadcastBlock(Block block);
+        void AddNewlyConnectedPeer(Peer peer);
+        List<Peer> Peers { get; }
     }
 
     public class NodeSynchornizator : INodeSynchornizator
@@ -19,25 +21,32 @@ namespace Node.Domain
             public string Name { get; set; }
         }
 
-        private List<Peer> Peers { get; set; }
+        public List<Peer> Peers { get; private set; }
+        private Peer Current { get; set; }
 
-        public NodeSynchornizator()
+        public NodeSynchornizator(Peer currentNode)
         {
             Peers = new List<Peer>();
-            DiscoverPeers();
+            Current = currentNode;
         }
 
-        private void DiscoverPeers()
+        private void SyncPeers()
         {
             for (int port = 5500; port < 5600; port++)
             {
                 string url = $"http://localhost:{port}";
                 RestClient cl = new RestClient(url);
-                NodeDetails nodeDetails = cl.Get<NodeDetails>("api/info");
-                if (nodeDetails != null)
-                    Peers.Add(new Peer(url, nodeDetails.Name));
+                Peer foundNode = cl.Post<Peer, Peer>("peer/connect", Current);
+                if (foundNode != null)
+                    Peers.Add(foundNode);
             }
         }
+
+        public void Init(Peer peer)
+        {
+            Current = peer;
+        }
+
 
         public List<Block> Sync()
         {
@@ -51,7 +60,7 @@ namespace Node.Domain
                 try
                 {
                     RestClient client = new RestClient(p.Url);
-                    client.Post<Transaction>("api/transaction/new", tx);
+                    client.Post("api/transaction/new", tx);
                 }
                 catch (Exception) { }
             }
@@ -68,6 +77,11 @@ namespace Node.Domain
                 }
                 catch (Exception) { }
             }
+        }
+
+        public void AddNewlyConnectedPeer(Peer peer)
+        {
+            Peers.Add(peer);
         }
     }
 }

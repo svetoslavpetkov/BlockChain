@@ -59,12 +59,13 @@ namespace Node.Controllers
         [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
         public IActionResult GetBlocks(uint fromIndex, uint count)
         {
-            int to = from - (int)count;
+            int from = (int)fromIndex;
+            int to = from + (int)count;
 
-            if (from < 0)
-            {
-                return NotFound($"Blocks starting from index {from} are not existing");
-            }
+            //if (from < 0)
+            //{
+            //    return NotFound($"Blocks starting from index {from} are not existing");
+            //}
 
             //Itterate backwards
             List<Domain.ApiModels.BlockApiModel> result = new List<Domain.ApiModels.BlockApiModel>();
@@ -78,7 +79,7 @@ namespace Node.Controllers
         [HttpPost("/new")]
         public void NewBlockFound(Block block)
         {
-
+            Node.AttachBroadcastedBlcok(block);
         }
 
         [HttpGet("balance/{address}")]
