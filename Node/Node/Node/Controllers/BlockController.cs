@@ -81,15 +81,5 @@ namespace Node.Controllers
         {
             Node.AttachBroadcastedBlcok(block);
         }
-
-        [HttpGet("balance/{address}")]
-        public IActionResult Balance(string address)
-        {
-            decimal balance = Node.GetBalance(address);
-            return Ok(balance);
-        }
-
-
-
     }
 }

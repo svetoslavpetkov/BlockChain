@@ -14,7 +14,7 @@ namespace Node.Domain
         public DateTime Started { get; set; }
         public ConcurrentDictionary<int, Block> BlockChain { get; private set; }
         internal ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
-        public ConcurrentDictionary<string, Block> MiningJobs { get; private set; }
+        private ConcurrentDictionary<string, Block> MiningJobs { get; set; }
         public int Difficulty { get; private set; }
         private ConcurrentDictionary<string, Block> BlocksInProgress { get; set; }
 
@@ -157,7 +157,7 @@ namespace Node.Domain
             return balance + minedBlokcs;
         }
 
-        public ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)
+        internal ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)
         {
             var result = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
 

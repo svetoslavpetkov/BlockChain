@@ -8,6 +8,7 @@ namespace Node.Domain
     {
         GetTransactionApiModel Get(string txHash);
         IEnumerable<GetTransactionApiModel> GetPending();
+        IEnumerable<GetTransactionApiModel> GetTransactions(string address, int count);
     }
 
     public class TransactionQuery : ITransactionQuery
@@ -41,6 +42,17 @@ namespace Node.Domain
         public IEnumerable<GetTransactionApiModel> GetPending()
         {
             return Node.PendingTransactions.Select(p => GetTransactionApiModel.FromTransaction(p));
+        }
+
+        public IEnumerable<GetTransactionApiModel> GetTransactions(string address, int count)
+        {
+            IEnumerable< GetTransactionApiModel> txs=  Node.GetTransactions(address, true)
+                         .OrderByDescending(tx => tx.DateCreated)
+                         .Take(count)
+                         .Select(tx => GetTransactionApiModel.FromTransaction(tx))
+                         .ToList();
+
+            return txs;
         }
     }
 }
