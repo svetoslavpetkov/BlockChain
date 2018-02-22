@@ -76,7 +76,7 @@ namespace Node.Controllers
             return Ok(result);
         }
 
-        [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
+        [HttpGet("getBlocksForSync/{fromIndex}/{count}")]
         public List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count)
         {
             List<BlockSyncApiModel> blocks = new List<BlockSyncApiModel>();
