@@ -34,14 +34,22 @@ namespace BlockChain.Core
             string[] parts = value.Split(DecimalDelimeter);
 
             ulong wholeTokens = ulong.Parse(parts[0]) * OneToken;
-            ulong fractionPart = ulong.Parse(parts[1].PadRight(9, '0'));
-
-            return wholeTokens + fractionPart;
+            if (parts.Length == 2)
+            {
+                wholeTokens += ulong.Parse(parts[1].PadRight(9, '0'));
+            }
+            return wholeTokens;
         }
 
         public static ulong ToTokens(this string value)
         {
             return ConvertToTokens(value);
+        }
+
+        public static ulong ToTokens(this decimal value)
+        {
+            string strValue = value.ToString(_numberFormatInfo);
+            return strValue.ToTokens();
         }
     }
 }

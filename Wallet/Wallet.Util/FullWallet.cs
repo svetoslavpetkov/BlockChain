@@ -42,7 +42,7 @@ namespace Wallet.Util
             {
                 var bitAdress = _safe.GetAddress(i);
                 var extKEy =_safe.ExtKey.Derive(KeyPath.Parse("/44'/60'/0'/0"));
-                simpleWallets.Add(new SimpleWallet(extKEy.ToBytes()));
+                simpleWallets.Add(new SimpleWallet(extKEy.PrivateKey.ToBytes()));
             }
 
             return simpleWallets;
