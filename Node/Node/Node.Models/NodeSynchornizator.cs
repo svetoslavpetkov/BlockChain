@@ -47,7 +47,6 @@ namespace Node.Domain
             Current = peer;
         }
 
-
         public List<Block> Sync()
         {
             return null;

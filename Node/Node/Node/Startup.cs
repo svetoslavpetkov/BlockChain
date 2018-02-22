@@ -34,6 +34,8 @@ namespace Node
             services.AddSingleton<IProofOfWork, ProofOfWork>();
             services.AddSingleton<ITransactionValidator, TransactionValidator>();
 
+            services.AddSingleton<Domain.ITransactionQuery, Domain.TransactionQuery>();
+            services.AddSingleton<Domain.IInfoQuery, Domain.InfoQuery>();
             services.AddSingleton<Domain.INodeSynchornizator>(s =>
             {
                 return new Domain.NodeSynchornizator(new Domain.Peer("http://localhost:5555", s.GetService<Domain.NodeInfo>().Name));
