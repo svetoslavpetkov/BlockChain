@@ -226,12 +226,28 @@ namespace Node.Domain
             return tempBlock;
         }
 
-        public void AttachBroadcastedBlcok(Block minedBlock)
+        public void AttachBroadcastedBlock(Block minedBlock, string nodeAddress)
         {
             ValidateBlockHash(minedBlock, minedBlock.Nonce, minedBlock.BlockHash);
 
             if (minedBlock.Index <= LastBlock.Index)
                 return;
+
+            // replace blockchain if another blockain is longer
+            int nodeDifference = minedBlock.Index - BlockChain.Count;
+            if (nodeDifference >= 6)
+            {
+                RestClient client = new RestClient(nodeAddress);
+                int startIndex = minedBlock.Index - nodeDifference;
+                var blockModels = client.Get<List<BlockSyncApiModel>>($"api/getblocksByFromIndexAndCount/{startIndex}/{nodeDifference}");
+
+                foreach (var bm in blockModels)
+                {
+                    Block block = Block.ReCreateBlock(bm);
+                    BlockChain.TryAdd(block.Index, block);
+                }
+
+            }
 
             // remove mined transactions from pending transactions
             List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();
