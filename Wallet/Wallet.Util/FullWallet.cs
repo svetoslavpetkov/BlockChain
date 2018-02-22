@@ -41,8 +41,8 @@ namespace Wallet.Util
             for (int i = 0; i < 10; i++)
             {
                 var bitAdress = _safe.GetAddress(i);
-                var extKEy =_safe.ExtKey.Derive(KeyPath.Parse("/44'/60'/0'/0"));
-                simpleWallets.Add(new SimpleWallet(extKEy.ToBytes()));
+                var extKEy =_safe.ExtKey.Derive(KeyPath.Parse($"/44'/60'/0'/{i}"));
+                simpleWallets.Add(new SimpleWallet(extKEy.PrivateKey.ToBytes()));
             }
 
             return simpleWallets;

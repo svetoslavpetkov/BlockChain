@@ -32,7 +32,7 @@ namespace Wallet.DesktopApp
 
         public string GetWalletFilePath(string walletName)
         {
-            return Path.Combine(WalletFolder, walletName);
+            return Path.Combine(WalletFolder, walletName) + ".json";
         }
     }
 }
