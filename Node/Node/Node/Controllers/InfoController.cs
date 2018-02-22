@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Node.Domain.ApiModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Node.Controllers
 {
@@ -11,27 +7,17 @@ namespace Node.Controllers
     [Route("api/info")]
     public class InfoController : Controller
     {
-        private Domain.Node Node { get; set; }
+        private Domain.IInfoQuery InfoQuery { get; set; }
 
-        public InfoController(Domain.Node node)
+        public InfoController(Domain.IInfoQuery infoQuery)
         {
-            Node = node;
+            InfoQuery = infoQuery;
         }
-
 
         [HttpGet]
         public IActionResult Get()
         {
-            NodeInfoApiModel result = new NodeInfoApiModel() {
-                About = Node.NodeInfo.About,
-                Name = Node.NodeInfo.Name,
-                ConfirmedTransactions = Node.BlockChain.Select(b => b.Value.Transactions.Count).Sum(),
-                PendingTransactions = Node.PendingTransactions.Count,
-                Difficulty = Node.Difficulty,
-                Peers = Node.Peers.Count,
-                Started = Node.Started
-            };
-            
+            NodeInfoApiModel result = InfoQuery.GetInfo();
             return Ok(result);
         }
     }

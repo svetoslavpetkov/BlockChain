@@ -13,8 +13,8 @@ namespace Node.Domain
         public NodeInfo NodeInfo { get; private set; }
         public DateTime Started { get; set; }
         public ConcurrentDictionary<int, Block> BlockChain { get; private set; }
-        public ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
-        public ConcurrentDictionary<string, Block> MiningJobs { get; private set; }
+        internal ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
+        private ConcurrentDictionary<string, Block> MiningJobs { get; set; }
         public int Difficulty { get; private set; }
         private ConcurrentDictionary<string, Block> BlocksInProgress { get; set; }
 
@@ -23,6 +23,14 @@ namespace Node.Domain
         private IProofOfWork ProofOfWork { get; set; }
         public ICryptoUtil CryptoUtil { get; set; }
         public ConcurrentBag<Peer> Peers { get; private set; }
+
+        private Block LastBlock
+        {
+            get
+            {
+                return BlockChain.Last().Value;
+            }
+        }
 
         public Node(INodeSynchornizator nodeSynchornizator, IProofOfWork proofOfWork,
             ICryptoUtil cryptoUtil, ITransactionValidator transactionValidator, NodeInfo nodeInfo)
@@ -54,21 +62,16 @@ namespace Node.Domain
 
         public void AddTransaction(Core.Transaction transaction)
         {
+            if (transaction == null)
+                throw new ArgumentException("'transaction' object cannot be null");
+
             //check whetehr we know that transaction
             if (PendingTransactions.FirstOrDefault(t => t.TransactionHash == transaction.TransactionHash) != null)
-            {
-                //should we also notify other perrs for known transactions ?
                 return;
-            }
 
             //check whether transaction is already mined
             if (BlockChain.Any(b => b.Value.Transactions.Any(t => t.TransactionHash == transaction.TransactionHash)))
-            {
                 return;
-            }
-
-            if (transaction == null)
-                throw new ArgumentException("'transaction' object cannot be null");
 
             if (string.IsNullOrWhiteSpace(transaction.SenderPublicKey))
                 throw new TransactionNotValidException("Sender signature cannot be empty");
@@ -146,7 +149,6 @@ namespace Node.Domain
             }
 
             //if address is miner winner
-
             ulong minedBlokcs = BlockChain
                 .Where(b => b.Value.MinedBy == address)
                 .ToList()
@@ -155,7 +157,7 @@ namespace Node.Domain
             return balance + minedBlokcs;
         }
 
-        public ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)
+        internal ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)
         {
             var result = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
 
@@ -182,12 +184,11 @@ namespace Node.Domain
             }
             else
             {
-                Block lastBlock = BlockChain.Last().Value;
-                bool hasNewBlock = lastBlock.Index >= blockInProgressForMiner.Index;
+                bool hasNewBlock = LastBlock.Index >= blockInProgressForMiner.Index;
                 bool hasNewerTransactions = false;
 
                 // still mining same block
-                if (lastBlock.Index == blockInProgressForMiner.Index - 1)
+                if (LastBlock.Index == blockInProgressForMiner.Index - 1)
                     hasNewerTransactions = PendingTransactions.Count > blockInProgressForMiner.Transactions.Count;
 
                 if (hasNewBlock || hasNewerTransactions)
@@ -205,7 +206,7 @@ namespace Node.Domain
 
         private MiningContext BuildNewMinerJob(Block blockForMine)
         {
-            string prevBlockHash = BlockChain.Last().Value.BlockDataHash;
+            string prevBlockHash = LastBlock.BlockDataHash;
 
             MiningContext context = new MiningContext();
             context.BlockIndex = blockForMine.Index;
@@ -225,13 +226,28 @@ namespace Node.Domain
             return tempBlock;
         }
 
-        public void AttachBroadcastedBlcok(Block minedBlock)
+        public void AttachBroadcastedBlock(Block minedBlock, string nodeAddress)
         {
-            ValidateBlockHash(minedBlock,minedBlock.Nonce, minedBlock.BlockHash);
+            ValidateBlockHash(minedBlock, minedBlock.Nonce, minedBlock.BlockHash);
 
-            Block last = BlockChain.Last().Value;
-            if (minedBlock.Index <= last.Index)
+            if (minedBlock.Index <= LastBlock.Index)
                 return;
+
+            // replace blockchain if another blockain is longer
+            int nodeDifference = minedBlock.Index - BlockChain.Count;
+            if (nodeDifference >= 6)
+            {
+                RestClient client = new RestClient(nodeAddress);
+                int startIndex = minedBlock.Index - nodeDifference;
+                var blockModels = client.Get<List<BlockSyncApiModel>>($"api/getblocksByFromIndexAndCount/{startIndex}/{nodeDifference}");
+
+                foreach (var bm in blockModels)
+                {
+                    Block block = Block.ReCreateBlock(bm);
+                    BlockChain.TryAdd(block.Index, block);
+                }
+
+            }
 
             // remove mined transactions from pending transactions
             List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();

@@ -18,7 +18,8 @@ namespace Node.Domain.ApiModels
 
         public string FeeString { get; set; }
 
-        public TransactionStatus Status {
+        public TransactionStatus Status
+        {
             get
             {
                 if (!this.MinedInBlock.HasValue)
@@ -35,7 +36,8 @@ namespace Node.Domain.ApiModels
 
         public static GetTransactionApiModel FromTransaction(Transaction input, int? minedInBlock = null)
         {
-            return new GetTransactionApiModel() {
+            return new GetTransactionApiModel()
+            {
                 AmountString = input.Amount.GetFormattedTokens(),
                 Amount = input.Amount,
                 DateCreated = input.DateCreated,

@@ -13,9 +13,12 @@ namespace Node.Controllers
     public class AccountController : Controller
     {
         private Domain.Node Node { get; set; }
-        public AccountController(Domain.Node node)
+        private Domain.ITransactionQuery TransactionQuery { get; set; }
+
+        public AccountController(Domain.Node node, Domain.ITransactionQuery transactionQuery)
         {
             Node = node;
+            TransactionQuery = transactionQuery;
         }
 
         [HttpGet("{address}/ballance")]
@@ -28,11 +31,8 @@ namespace Node.Controllers
         [HttpGet("{address}/latesttransactions/{count}")]
         public IActionResult GetTransactions(string address, int count)
         {
-            return Ok(Node.GetTransactions(address, true)
-                        .Select( tx => GetTransactionApiModel.FromTransaction(tx))
-                        .OrderByDescending(tx => tx.DateCreated)
-                        .Take(count)
-                        .ToList());
+            var txs = TransactionQuery.GetTransactions(address, count);
+            return Ok(txs);
         }
     }
 }

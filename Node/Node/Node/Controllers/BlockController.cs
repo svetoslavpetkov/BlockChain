@@ -76,20 +76,22 @@ namespace Node.Controllers
             return Ok(result);
         }
 
+        [HttpGet("getBlocksForSync/{fromIndex}/{count}")]
+        public List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count)
+        {
+            List<BlockSyncApiModel> blocks = new List<BlockSyncApiModel>();
+            int endIndex = fromIndex + count;
+            for (int i = fromIndex; i < endIndex; i++)
+            {
+                blocks.Add(BlockSyncApiModel.FromBlock(Node.BlockChain[i]));
+            }
+            return blocks;
+        }
+
         [HttpPost("/new")]
-        public void NewBlockFound(Block block)
+        public void NewBlockFound(NewBlockApiModel blockInfo)
         {
-            Node.AttachBroadcastedBlcok(block);
+            Node.AttachBroadcastedBlock(blockInfo.Block,blockInfo.NodeAddress);
         }
-
-        [HttpGet("balance/{address}")]
-        public IActionResult Balance(string address)
-        {
-            decimal balance = Node.GetBalance(address);
-            return Ok(balance);
-        }
-
-
-
     }
 }

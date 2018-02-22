@@ -13,9 +13,12 @@ namespace Node.Controllers
     public class TransactionController : Controller
     {
         private Domain.Node Node { get; set; }
-        public TransactionController(Domain.Node node)
+        private Domain.ITransactionQuery TransactionQuery { get; set; }
+
+        public TransactionController(Domain.Node node, Domain.ITransactionQuery transactionQuery)
         {
             Node = node;
+            TransactionQuery = transactionQuery;
         }
 
         [HttpPost("new")]
@@ -25,34 +28,23 @@ namespace Node.Controllers
         }
 
         [HttpGet("{tx}")]
+        [ProducesResponseType(typeof(GetTransactionApiModel),200)]
         public IActionResult Get(string tx)
         {
-            GetTransactionApiModel result = Node.PendingTransactions
-                .Where(t => t.TransactionHash == tx)
-                .Select(t=> GetTransactionApiModel.FromTransaction(t))
-                .FirstOrDefault();
-            if (result == null )
-            {
-                result = Node.BlockChain
-                    .SelectMany(b => b.Value.Transactions.Select(t => new { BlockIndex = b.Key, Transaction = t }))
-                    .Where(t => t.Transaction.TransactionHash == tx)
-                    .Select(x => GetTransactionApiModel.FromTransaction(x.Transaction, x.BlockIndex))
-                    .FirstOrDefault();
-            }
+            GetTransactionApiModel result = TransactionQuery.Get(tx);
 
+            if (result == null)
+              return  NotFound($"transaction with id {tx} is not found");
 
-            if (result != null)
-            {
-                return Ok(GetTransactionApiModel.FromTransaction(result));
-            }
-
-            return NotFound($"transaction with id {tx} is not found");
+            return Ok(result);
         }
 
         [HttpGet("pending")]
-        public IEnumerable<GetTransactionApiModel> GetPending()
+        [ProducesResponseType(typeof(IEnumerable<GetTransactionApiModel>), 200)]
+        public IActionResult GetPending()
         {
-            return Node.PendingTransactions.Select(p => GetTransactionApiModel.FromTransaction(p));
+            IEnumerable<GetTransactionApiModel> pendingTx = TransactionQuery.GetPending();
+            return Ok(pendingTx);
         }
     }
 }
