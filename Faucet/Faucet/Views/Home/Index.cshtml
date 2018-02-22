@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "BlockChain Faucet";
+}
+@model FaucetViewModel
+
+<h1>
+    Faucet that gives 5 coins
+</h1>
+
+
+<div class="row">
+    <img src="~/images/Faucet.jpg" />
+</div>
+
+<hr />
+
+@using (@Html.BeginForm())
+{
+<div class="row">
+    <div class="col-md-6">
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon" id="sizing-addon1">@@</span>
+            @Html.TextBoxFor(x => x.ReceiverAddrees, new { @class = "form-control", placeholder = "Receiver address", aria_describedby = "sizing-addon1" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <input type="submit" value="Give me 5 coins"  class="btn btn-primary btn-lg"/>
+    </div>
+</div>
+}
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert  alert-success" role="alert">
+        @Model.SuccessMessage
+    </div>
+}
