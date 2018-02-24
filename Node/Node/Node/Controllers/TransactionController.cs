@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using BlockChain.Core;
-using Node.Domain.ApiModels;
+using Node.Domain;
 
 namespace Node.Controllers
 {
@@ -13,9 +10,9 @@ namespace Node.Controllers
     public class TransactionController : Controller
     {
         private Domain.Node Node { get; set; }
-        private Domain.ITransactionQuery TransactionQuery { get; set; }
+        private ITransactionQuery TransactionQuery { get; set; }
 
-        public TransactionController(Domain.Node node, Domain.ITransactionQuery transactionQuery)
+        public TransactionController(Domain.Node node, ITransactionQuery transactionQuery)
         {
             Node = node;
             TransactionQuery = transactionQuery;
@@ -28,13 +25,13 @@ namespace Node.Controllers
         }
 
         [HttpGet("{tx}")]
-        [ProducesResponseType(typeof(GetTransactionApiModel),200)]
+        [ProducesResponseType(typeof(GetTransactionApiModel), 200)]
         public IActionResult Get(string tx)
         {
             GetTransactionApiModel result = TransactionQuery.Get(tx);
 
             if (result == null)
-              return  NotFound($"transaction with id {tx} is not found");
+                return NotFound($"transaction with id {tx} is not found");
 
             return Ok(result);
         }

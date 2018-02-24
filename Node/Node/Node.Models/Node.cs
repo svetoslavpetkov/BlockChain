@@ -120,7 +120,7 @@ namespace Node.Domain
 
             var test = BlockChain.TryAdd(block.Index, block);
             BlocksInProgress[minerAddress] = null;
-
+            NodeSynchornizator.BroadcastBlock(block);
         }
 
         private void ValidateBlockHash(Block block, int nonce, string hash)
@@ -226,8 +226,9 @@ namespace Node.Domain
             return tempBlock;
         }
 
-        public void AttachBroadcastedBlock(Block minedBlock, string nodeAddress)
+        public void AttachBroadcastedBlock(BlockSyncApiModel block, string nodeAddress)
         {
+            Block minedBlock = Block.ReCreateBlock(block);
             ValidateBlockHash(minedBlock, minedBlock.Nonce, minedBlock.BlockHash);
 
             if (minedBlock.Index <= LastBlock.Index)
@@ -237,22 +238,26 @@ namespace Node.Domain
             int nodeDifference = minedBlock.Index - BlockChain.Count;
             if (nodeDifference >= 6)
             {
-                RestClient client = new RestClient(nodeAddress);
                 int startIndex = minedBlock.Index - nodeDifference;
-                var blockModels = client.Get<List<BlockSyncApiModel>>($"api/getblocksByFromIndexAndCount/{startIndex}/{nodeDifference}");
+                List<Block> forkedBlocks = NodeSynchornizator.GetBlocksForSync(startIndex, nodeDifference, nodeAddress);
 
-                foreach (var bm in blockModels)
-                {
-                    Block block = Block.ReCreateBlock(bm);
-                    BlockChain.TryAdd(block.Index, block);
-                }
+                foreach (var bl in forkedBlocks)
+                    BlockChain.TryAdd(bl.Index, bl);
+                List<string> blockTxs = forkedBlocks.SelectMany(b => b.Transactions).Select(t =>t.TransactionHash).ToList();
+
+                PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.
+                    Where(t => !blockTxs.Contains(t.TransactionHash)));
+            }
+            else
+            {
+                // remove mined transactions from pending transactions
+                List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();
+                PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.Where(t => !minedTxIds.Contains(t.TransactionHash)).ToList());
+
+                BlockChain.TryAdd(minedBlock.Index, minedBlock);
             }
 
-            // remove mined transactions from pending transactions
-            List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();
-            PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.Where(t => !minedTxIds.Contains(t.TransactionHash)).ToList());
-
-            BlockChain.TryAdd(minedBlock.Index, minedBlock);
+            
         }
     }
 }
