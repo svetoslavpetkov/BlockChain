@@ -23,7 +23,7 @@ namespace Node.Controllers
         }
 
         [HttpPost("connect")]
-        public PeerApiModel Connect(PeerApiModel peer)
+        public PeerApiModel Connect([FromBody] PeerApiModel peer)
         {
            PeerApiModel thisPeer =  NodeSynchornizator.AddNewlyConnectedPeer(peer);
 
