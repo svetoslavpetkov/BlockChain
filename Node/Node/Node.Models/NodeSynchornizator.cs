@@ -12,7 +12,7 @@ namespace Node.Domain
         List<Block> Sync();
         void BroadcastTransaction(Transaction tx);
         void BroadcastBlock(Block block);
-        void AddNewlyConnectedPeer(Peer peer);
+        PeerApiModel AddNewlyConnectedPeer(PeerApiModel peer);
         List<Block> GetBlocksForSync(int startIndex, int count, string nodeAddress);
         void SyncPeers();
     }
@@ -45,9 +45,10 @@ namespace Node.Domain
                 RestClient cl = new RestClient(url);
                 try
                 {
-                    Peer foundNode = cl.Post<Peer, Peer>("peer/connect", Current);
+                    PeerApiModel pm = new PeerApiModel() { Url = url };
+                    PeerApiModel foundNode = cl.Post<PeerApiModel, PeerApiModel>("peer/connect", pm);
                     if (foundNode != null)
-                        Peers.Add(foundNode);
+                        Peers.Add(new Peer(foundNode.Url,foundNode.Name));
                 }
                 catch (Exception)
                 {
@@ -95,9 +96,12 @@ namespace Node.Domain
             }
         }
 
-        public void AddNewlyConnectedPeer(Peer peer)
+        public PeerApiModel AddNewlyConnectedPeer(PeerApiModel p)
         {
+            Peer peer = new Peer(p.Url, p.Name);
             Peers.Add(peer);
+
+            return PeerApiModel.FromPeer(Current);
         }
 
         public List<Block> GetBlocksForSync(int startIndex, int count, string nodeAddress)

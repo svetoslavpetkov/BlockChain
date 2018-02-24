@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Node.Domain.ApiModels
+﻿
+namespace Node.Domain
 {
-    public class PeerApiModel : Peer
+    public class PeerApiModel
     {
-        public PeerApiModel(string url, string name)
-            : base(url, name)
-        {
+        public string Url { get; set; }
 
-        }
+        public string Name { get; set; }
 
         public static PeerApiModel FromPeer(Peer peer)
         {
-            return new PeerApiModel(peer.Url, peer.Name);
+            return new PeerApiModel() { Url = peer.Url, Name = peer.Name };
         }
-
-
     }
 }

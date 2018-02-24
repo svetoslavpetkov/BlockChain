@@ -9,9 +9,9 @@ namespace Node.Controllers
     [Route("api/peers")]
     public class PeersController : Controller
     {
-        private Domain.INodeSynchornizator NodeSynchornizator { get; set; }
+        private INodeSynchornizator NodeSynchornizator { get; set; }
 
-        public PeersController(Domain.Node node, INodeSynchornizator nodeSynchornizator)
+        public PeersController(NodeSynchornizator nodeSynchornizator)
         {
             NodeSynchornizator = nodeSynchornizator;
         }
@@ -23,10 +23,11 @@ namespace Node.Controllers
         }
 
         [HttpPost("/connect")]
-        public IActionResult Connect(PeerApiModel peer)
+        public PeerApiModel Connect(PeerApiModel peer)
         {
-            NodeSynchornizator.AddNewlyConnectedPeer(new Peer(peer.Url, peer.Url));
-            return Ok();
+           PeerApiModel thisPeer =  NodeSynchornizator.AddNewlyConnectedPeer(peer);
+
+            return thisPeer;
         }
     }
 }
