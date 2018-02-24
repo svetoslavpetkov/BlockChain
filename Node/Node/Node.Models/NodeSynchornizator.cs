@@ -14,6 +14,7 @@ namespace Node.Domain
         void BroadcastBlock(Block block);
         void AddNewlyConnectedPeer(Peer peer);
         List<Block> GetBlocksForSync(int startIndex, int count, string nodeAddress);
+        void SyncPeers();
     }
 
     public class NodeSynchornizator : INodeSynchornizator
@@ -30,10 +31,9 @@ namespace Node.Domain
         {
             Peers = new List<Peer>();
             Current = currentNode;
-            SyncPeers();
         }
 
-        private void SyncPeers()
+        public void SyncPeers()
         {
             for (int port = 5500; port < 5600; port++)
             {
