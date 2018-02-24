@@ -1,7 +1,6 @@
 ﻿using BlockChain.Core;
-using System;
 
-namespace Node.Domain.ApiModels
+namespace Node.Domain
 {
     public enum TransactionStatus
     {

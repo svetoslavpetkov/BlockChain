@@ -9,6 +9,7 @@ namespace Node.Domain
         GetTransactionApiModel Get(string txHash);
         IEnumerable<GetTransactionApiModel> GetPending();
         IEnumerable<GetTransactionApiModel> GetTransactions(string address, int count);
+        IEnumerable<GetTransactionApiModel> GetBlcokTransactions(int index);
     }
 
     public class TransactionQuery : ITransactionQuery
@@ -53,6 +54,21 @@ namespace Node.Domain
                          .ToList();
 
             return txs;
+        }
+
+        public IEnumerable<GetTransactionApiModel> GetBlcokTransactions(int index)
+        {
+            bool success = Node.BlockChain.TryGetValue(index, out Block block);
+
+            List<GetTransactionApiModel> txs = new List<GetTransactionApiModel>();
+
+            if (success)
+            {
+               txs = block.Transactions.Select(tx => GetTransactionApiModel.FromTransaction(tx)).ToList();
+               return txs;
+            }
+
+            return null;
         }
     }
 }

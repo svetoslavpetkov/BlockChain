@@ -35,16 +35,10 @@ namespace Node.Controllers
         [HttpGet("{index}/transactions")]
         public IActionResult GetBlockTransactions(int index)
         {
-            Block result;
-            bool success = Node.BlockChain.TryGetValue(index, out result);
+            IEnumerable < GetTransactionApiModel > txs =  TransactionQuery.GetBlcokTransactions(index);
 
-            if (success)
-            {
-                return Ok(result
-                            .Transactions
-                            .Select(tx=> Domain.ApiModels.GetTransactionApiModel.FromTransaction(tx))
-                            .ToList());
-            }
+            if (txs != null)
+                return Ok(txs);
 
             return NotFound($"Block with index {index} is not found");
         }
