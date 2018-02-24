@@ -15,8 +15,37 @@ namespace Wallet.UI
         private static Dictionary<string, Action> Commands = new Dictionary<string, Action>(new List<KeyValuePair<string, Action>>() {
             new KeyValuePair<string, Action>("create",CreateWallet),
             new KeyValuePair<string, Action>("exit",ExitApplication),
-            new KeyValuePair<string, Action>("open",OpenWallet)
+            new KeyValuePair<string, Action>("open",OpenWallet),
+            new KeyValuePair<string, Action>("recover",RecoverWallet),
+            new KeyValuePair<string, Action>("list-wallets",GetWallets)
+
         });
+
+        private static void RecoverWallet()
+        {
+            FullWallet wallet = null;
+            try
+            {
+                string mnemonic = Input.String("Enter mnemonic: ");
+                string password = Input.Password();
+                string walletName = Input.String("Enter new wallet name");
+
+                wallet = FullWallet.Recover(mnemonic, password, GetWalletPath(walletName), walletName);
+
+                Output.WriteSuccess("Wallet recovered");
+                Input.EnterKey();
+            }
+            catch (Exception ex)
+            {
+                Output.WriteError(ex.Message);
+                Input.EnterKey();
+            }
+
+            if (wallet != null)
+            {
+                WalletHandler walletHandler = new WalletHandler(wallet, blockChainClient);
+            }
+        }
 
         private static void OpenWallet()
         {
@@ -130,13 +159,32 @@ namespace Wallet.UI
             }
         }
 
-        /*
-        public static List<string> GetWallets()
+        
+        public static void GetWallets()
         {
             DirectoryInfo di = new DirectoryInfo(WalletPath);
+            var walletFiles = di.GetFiles("*.json");
 
-            return di.GetFiles
-        }*/
+            if (walletFiles.Length == 0)
+            {
+                Output.WriteError("No wallets found");
+                Input.EnterKey();
+                return;
+            }
+
+            string headerName = "Wallet name";
+            string headerDateCreated = "Date created";
+            string format = "{0,-20}   {1,-15}";
+            Console.WriteLine(format, headerName, headerDateCreated);
+            Console.WriteLine("-------------------------------------------------------------------");
+            foreach (var file in walletFiles.OrderBy(f=> f.Name))
+            {
+                Console.WriteLine(format, file.Name, file.CreationTime.ToString());
+            }
+
+            Console.WriteLine();
+            Input.EnterKey();
+        }
 
         private static string GetWalletPath(string walletName)
         {
@@ -147,270 +195,11 @@ namespace Wallet.UI
     }
 
 
-    public class WalletHandler
-    {
-        public static void PrintWalletAccounts(FullWallet wallet, IBlockChainClient blockChainClient)
-        {
-            var accounts = wallet.GetAccounts();
-            ulong totalBallance = 0;
-            for (int i = 0; i < accounts.Count; i++)
-            {
-                Console.WriteLine($"**** Account  {i}");
-                Console.WriteLine($"PrivateKey: " + accounts[i].PrivateKey);
-                Console.WriteLine($"Address: " + accounts[i].Address);
+    
 
-                ulong ballance = blockChainClient.GetBalance(accounts[i].Address);
-                totalBallance += ballance;
+    
 
-                Console.WriteLine($"Ballance: " + ballance.GetFormattedTokens());
-            }
-        }
-
-        public FullWallet Wallet { get; set; }
-
-        public IBlockChainClient BlockChainClient { get; set; }
-
-        public Dictionary<string, Action> Commands { get; set; } = new Dictionary<string, Action>() {};
-
-        private void Accounts()
-        {
-            throw new NotImplementedException();
-        }
-
-        public WalletHandler(FullWallet wallet, IBlockChainClient blockChainClient)
-        {
-            Wallet = wallet;
-            BlockChainClient = blockChainClient;
-            //new KeyValuePair<string, Action>("accounts",Accounts)
-            Commands.Add("accounts", ViewAccounts);
-            Commands.Add("send", Send);
-            Commands.Add("close", CloseWallet);
-        }
-
-        private void CloseWallet()
-        {
-            throw new ExitCommandException();
-        }
-
-        private void Send()
-        {
-            int accountIndex = Input.Int("Enter acount index: ", 0 , 9);
-            string receiverAddress = Input.String("Receiver address: ");
-            ulong amount = Input.Decimal("Enter value to send: ").ToTokens();
-
-            Console.WriteLine("Processing ... ");
-
-            var account = Wallet.GetAccounts()[accountIndex];
-            var transaction = account.Sign(receiverAddress, amount);
-            ulong ballance = BlockChainClient.GetBalance(account.Address);
-
-            var result = BlockChainClient.SendTransaction(transaction);
-
-            if (result)
-            {
-                Output.WriteSuccess("Money send to blockchain");
-            }
-            else
-            {
-                Output.WriteError("Error sending the money");
-            }
-            Input.EnterKey();
-        }
-
-        private void ViewAccounts()
-        {
-            PrintWalletAccounts(Wallet, BlockChainClient);
-            Input.EnterKey();
-        }
-
-        public void Run()
-        {
-            try
-            {
-                while (true)
-                {
-                    Console.Clear();
-                    Output.WriteHeading($"Open wallet: {Wallet.Name}");
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    string command = Input.Command("Enter command", Commands.Select(c => c.Key).ToList());
-                    //Input.String("Enter command: " + string.Join(',', Commands.Select(c => c.Key).ToList()) + ": ",
-                    //x => { return Commands.ContainsKey(x.ToLower()); }
-                    //);
-                    //execute the command
-                    Commands[command.ToLower()]();
-                }
-            }
-            catch (ExitCommandException ex)
-            {
-                Console.WriteLine("Closign wallet");
-                Input.EnterKey();
-            }
-        }
-    }
-
-    public static class Output
-    {
-        public static void WriteHeading(string message)
-        {
-            Write(message, ConsoleColor.Blue, ConsoleColor.White);
-        }
-
-        public static void WriteError(string message)
-        {
-            Write(message, ConsoleColor.Red, ConsoleColor.White);
-        }
-
-        public static void WriteSuccess(string message)
-        {
-            Write(message, ConsoleColor.Green, ConsoleColor.White);
-        }
-
-
-        public static void Write(string message, ConsoleColor foreground, ConsoleColor background)
-        {
-            string surroundingLines = " ".PadRight(message.Length + 2);
-
-            Console.ForegroundColor = foreground;
-            Console.BackgroundColor = background;
-            Console.WriteLine(surroundingLines);
-            Console.WriteLine(" " + message + " ");
-            Console.WriteLine(surroundingLines);
-            Console.ResetColor();
-        }
-    }
-
-    public static class Input
-    {
-        public static string Command(string label, IEnumerable<string> commands)
-        {
-            string result = "";
-            bool validInput = false;
-            while (!validInput)
-            {
-                Console.Write(label + " " + string.Join(',', commands) + ": ");
-                var pressedKey = Console.ReadKey(true);
-                while (pressedKey.Key != ConsoleKey.Enter)
-                {
-                    if (pressedKey.Key == ConsoleKey.Tab)
-                    {
-                        var commandsMathc = commands.SingleOrDefault(c => c.StartsWith(result));
-                        if (commandsMathc != null)
-                        {
-                            Console.Write(commandsMathc.Substring(result.Length));
-                            result = commandsMathc;
-                        }
-                    }
-                    else if(pressedKey.Key == ConsoleKey.Backspace)
-                    {
-                        Console.Write("\b\0\b");
-                        result = result.Substring(0, result.Length - 1);
-                    }
-                    else
-                    {
-                        result += pressedKey.KeyChar;
-                        Console.Write(pressedKey.KeyChar);
-                    }
-
-                    pressedKey = Console.ReadKey(true);
-                }
-
-                if (commands.Any(c=> c.ToLower() == result.ToLower()))
-                {
-                    break;
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-            return result.ToLower();
-        }
-
-        public static string String(string label, Func<string, bool> validation = null)
-        {
-            string result = string.Empty;
-
-            while (result == string.Empty)
-            {
-                Console.Write(label);
-                result = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(result) ||
-                    (validation != null && !validation(result))
-                    )
-                {
-                    Output.WriteError("Input is invvalid");
-                    result = string.Empty;
-                }
-            }
-
-
-            return result;
-        }
-
-        public static string Password(string message = "Enter password:")
-        {
-            Console.Write(message);
-            StringBuilder sb = new StringBuilder();
-            while (true)
-            {
-                ConsoleKeyInfo cki = Console.ReadKey(true);
-                if (cki.Key == ConsoleKey.Enter)
-                {
-                    Console.WriteLine();
-                    break;
-                }
-
-                if (cki.Key == ConsoleKey.Backspace)
-                {
-                    if (sb.Length > 0)
-                    {
-                        Console.Write("\b\0\b");
-                        sb.Length--;
-                    }
-
-                    continue;
-                }
-
-                Console.Write('$');
-                sb.Append(cki.KeyChar);
-            }
-
-            return sb.ToString();
-        }
-
-        public static uint Uint(string message, uint rangeFrom = uint.MinValue, uint rangeTo = uint.MaxValue)
-        {
-            uint result = 0;
-
-            string input = String(message, x => { return uint.TryParse(x, out result) && result >= rangeFrom && result<= rangeTo; });
-
-            return uint.Parse(input);
-        }
-
-        public static int Int(string message, int rangeFrom = 0, int rangeTo = int.MaxValue)
-        {
-            int result = 0;
-
-            string input = String(message, x => { return int.TryParse(x, out result) && result >= rangeFrom && result <= rangeTo; });
-
-            return int.Parse(input);
-        }
-
-        public static decimal Decimal(string message)
-        {
-            decimal result = 0m;
-
-            string input = String(message, x => { return decimal.TryParse(x, out result); });
-
-            return decimal.Parse(input);
-        }
-
-        public static void EnterKey(string message= "Press [Enter] key to continue")
-        {
-            Console.WriteLine(message);
-            Console.ReadLine();
-        }
-    }
+   
 
 
     public class ExitCommandException : Exception

@@ -21,6 +21,15 @@ namespace Wallet.Util
             return mnemonic.ToString();
         }
 
+        public static FullWallet Recover(string mnemonicString, string password, string walletJsonFilePath, string walletName)
+        {
+            Mnemonic mnemonic = new Mnemonic(mnemonicString);
+
+            var safe = Safe.Recover(mnemonic, password, walletJsonFilePath, Network);
+
+            return new FullWallet(walletName, safe);
+        }
+
 
         private Safe _safe;
 
@@ -30,7 +39,12 @@ namespace Wallet.Util
         public FullWallet(string name,string jsonFilePath, string password)
         {
             _safe = Safe.Load(password, jsonFilePath);
+            Name = name;
+        }
 
+        private FullWallet(string name, Safe safe)
+        {
+            _safe = safe;
             Name = name;
         }
 
