@@ -1,8 +1,11 @@
 ﻿using BlockChain.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 
 namespace Node
 {
@@ -33,6 +36,7 @@ namespace Node
             services.AddSingleton<ICryptoUtil, CryptoUtil>();
             services.AddSingleton<IProofOfWork, ProofOfWork>();
             services.AddSingleton<ITransactionValidator, TransactionValidator>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<Domain.ITransactionQuery, Domain.TransactionQuery>();
             services.AddSingleton<Domain.IInfoQuery, Domain.InfoQuery>();
@@ -40,7 +44,9 @@ namespace Node
 
             services.AddSingleton<Domain.INodeSynchornizator>(s =>
             {
-                return new Domain.NodeSynchornizator(new Domain.Peer("http://localhost:5555", s.GetService<Domain.NodeInfo>().Name));
+                var httpContextAccessor = s.GetService<IHttpContextAccessor>();
+                
+                return new Domain.NodeSynchornizator(new Domain.Peer("http://" + httpContextAccessor.HttpContext.Request.Host.Value, s.GetService<Domain.NodeInfo>().Name));
             });
             services.AddSingleton<Domain.Node>();
         }
