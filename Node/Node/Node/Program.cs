@@ -22,7 +22,7 @@ namespace Node
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("hosting.json", optional: true)
+                .AddJsonFile("appsettings.json", optional: true)
                 .Build();
 
             return WebHost.CreateDefaultBuilder(new string[] { })
