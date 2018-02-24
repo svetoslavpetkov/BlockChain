@@ -118,7 +118,7 @@ namespace Node.Domain
 
             PendingTransactions = new ConcurrentBag<Transaction>(notMinedTxs);
 
-            var test = BlockChain.TryAdd(block.Index, block);
+            BlockChain.TryAdd(block.Index, block);
             BlocksInProgress[minerAddress] = null;
             NodeSynchornizator.BroadcastBlock(block);
         }
