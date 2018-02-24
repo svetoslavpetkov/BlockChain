@@ -35,13 +35,23 @@ namespace Node.Domain
 
         private void SyncPeers()
         {
-            for (int port = 5500; port < 5600; port++)
+            for (int port = 5555; port < 5560; port++)
             {
                 string url = $"http://localhost:{port}";
+                if (url == Current.Url)
+                {
+                    continue;
+                }
                 RestClient cl = new RestClient(url);
-                Peer foundNode = cl.Post<Peer, Peer>("peer/connect", Current);
-                if (foundNode != null)
-                    Peers.Add(foundNode);
+                try
+                {
+                    Peer foundNode = cl.Post<Peer, Peer>("peer/connect", Current);
+                    if (foundNode != null)
+                        Peers.Add(foundNode);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 

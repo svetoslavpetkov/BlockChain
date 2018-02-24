@@ -14,24 +14,20 @@ namespace Node
     {
         public static void Main(string[] args)
         {
+
             BuildWebHost(args).Run();
         }
 
         public static IWebHost BuildWebHost(string[] args)
         {
-            int port = 5555;
-
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i] == "-p" && i+1 <args.Length)
-                {
-                    port = int.Parse(args[i + 1]);
-                }
-            }
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("hosting.json", optional: true)
+                .Build();
 
             return WebHost.CreateDefaultBuilder(new string[] { })
+                .UseConfiguration(config)
                 .UseStartup<Startup>()
-                .UseUrls($"http://localhost:{port}/")
                 .Build();
         }
     }
