@@ -68,7 +68,7 @@ namespace Node.Controllers
             return blocks;
         }
 
-        [HttpPost("/new")]
+        [HttpPost("new")]
         public void NewBlockFound(NewBlockApiModel blockInfo)
         {
 
