@@ -25,13 +25,13 @@ namespace Node.Controllers
         }
 
         [HttpGet("{tx}")]
-        [ProducesResponseType(typeof(GetTransactionApiModel),200)]
+        [ProducesResponseType(typeof(GetTransactionApiModel), 200)]
         public IActionResult Get(string tx)
         {
             GetTransactionApiModel result = TransactionQuery.Get(tx);
 
             if (result == null)
-              return  NotFound($"transaction with id {tx} is not found");
+                return NotFound($"transaction with id {tx} is not found");
 
             return Ok(result);
         }

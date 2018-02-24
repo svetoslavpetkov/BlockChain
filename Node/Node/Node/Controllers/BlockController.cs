@@ -31,7 +31,6 @@ namespace Node.Controllers
             return NotFound($"Block with index {index} is not found");
         }
 
-
         [HttpGet("{index}/transactions")]
         public IActionResult GetBlockTransactions(int index)
         {
@@ -65,12 +64,7 @@ namespace Node.Controllers
         [HttpGet("getBlocksForSync/{fromIndex}/{count}")]
         public List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count)
         {
-            List<BlockSyncApiModel> blocks = new List<BlockSyncApiModel>();
-            int endIndex = fromIndex + count;
-            for (int i = fromIndex; i < endIndex; i++)
-            {
-                blocks.Add(BlockSyncApiModel.FromBlock(Node.BlockChain[i]));
-            }
+            List<BlockSyncApiModel> blocks = BlockQuery.GetBlocksForSync(fromIndex, count);
             return blocks;
         }
 
