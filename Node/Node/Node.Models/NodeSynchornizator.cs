@@ -92,7 +92,7 @@ namespace Node.Domain
 
                     client.Post("api/block/new", apiModel);
                 }
-                catch (Exception) { }
+                catch (Exception ex) { }
             }
         }
 
