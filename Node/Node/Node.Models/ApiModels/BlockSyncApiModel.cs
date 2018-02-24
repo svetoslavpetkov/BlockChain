@@ -11,7 +11,7 @@ namespace Node.Domain
         public List<Transaction> Transactions { get; set; }
         public int Difficulty { get; set; }
         public string PreviousBlockHash { get; set; }
-        public string MinedBy { get; private set; }
+        public string MinedBy { get; set; }
         public string BlockDataHash { get; set; }
         public string BlockHash { get; set; }
         public int Nonce { get; set; }

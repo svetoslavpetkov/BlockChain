@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Node.Domain.ApiModels
+﻿namespace Node.Domain.ApiModels
 {
     public class BlockMinedApiModel
     {
@@ -11,7 +7,5 @@ namespace Node.Domain.ApiModels
         public int Nonce { get; set; }
 
         public string Hash { get; set; }
-
-        //string minerAddress, int nonce, string hash
     }
 }
