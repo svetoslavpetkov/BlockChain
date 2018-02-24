@@ -71,6 +71,7 @@ namespace Node.Controllers
         [HttpPost("/new")]
         public void NewBlockFound(NewBlockApiModel blockInfo)
         {
+
             Node.AttachBroadcastedBlock(blockInfo.Block,blockInfo.NodeAddress);
         }
     }

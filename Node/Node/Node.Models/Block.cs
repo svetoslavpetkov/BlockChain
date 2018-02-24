@@ -21,7 +21,7 @@ namespace Node.Domain
         public int Nonce { get; private set; }
         public DateTime CreatedDate { get; private set; }
 
-        public ICryptoUtil CryptoUtil { get; set; }
+        private ICryptoUtil CryptoUtil { get; set; }
 
         public ulong BlockReward
         {

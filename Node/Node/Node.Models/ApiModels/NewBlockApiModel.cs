@@ -2,7 +2,7 @@
 {
     public class NewBlockApiModel
     {
-        public Block Block { get; set; }
+        public BlockSyncApiModel Block { get; set; }
         public string NodeAddress { get; set; }
     }
 }
