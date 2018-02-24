@@ -46,11 +46,11 @@ namespace Node.Domain
                 try
                 {
                     PeerApiModel pm = new PeerApiModel() { Url = url };
-                    PeerApiModel foundNode = cl.Post<PeerApiModel, PeerApiModel>("peer/connect", pm);
+                    PeerApiModel foundNode = cl.Post<PeerApiModel, PeerApiModel>("peers/connect", pm);
                     if (foundNode != null)
                         Peers.Add(new Peer(foundNode.Url,foundNode.Name));
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }
