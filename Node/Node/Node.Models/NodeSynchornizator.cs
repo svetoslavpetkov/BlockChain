@@ -46,7 +46,7 @@ namespace Node.Domain
                 try
                 {
                     PeerApiModel pm = new PeerApiModel() { Url = Current.Url, Name = Current.Name };
-                    PeerApiModel foundNode = cl.Post<PeerApiModel, PeerApiModel>("peers/connect", pm);
+                    PeerApiModel foundNode = cl.Post<PeerApiModel, PeerApiModel>("api/peers/connect", pm);
                     if (foundNode != null)
                         Peers.Add(new Peer(foundNode.Url,foundNode.Name));
                 }
