@@ -11,7 +11,7 @@ namespace Node.Controllers
     {
         private INodeSynchornizator NodeSynchornizator { get; set; }
 
-        public PeersController(NodeSynchornizator nodeSynchornizator)
+        public PeersController(INodeSynchornizator nodeSynchornizator)
         {
             NodeSynchornizator = nodeSynchornizator;
         }
@@ -22,7 +22,7 @@ namespace Node.Controllers
             return Ok(NodeSynchornizator.Peers.Select(p => PeerApiModel.FromPeer(p)).ToList());
         }
 
-        [HttpPost("/connect")]
+        [HttpPost("connect")]
         public PeerApiModel Connect(PeerApiModel peer)
         {
            PeerApiModel thisPeer =  NodeSynchornizator.AddNewlyConnectedPeer(peer);
