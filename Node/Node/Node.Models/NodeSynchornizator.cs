@@ -45,11 +45,11 @@ namespace Node.Domain
                 RestClient cl = new RestClient(url);
                 try
                 {
-                    Peer foundNode = cl.Post<Peer, Peer>("peer/connect", Current);
+                    Peer foundNode = cl.Post<Peer, Peer>("api/peers/connect", Current);
                     if (foundNode != null)
                         Peers.Add(foundNode);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }
