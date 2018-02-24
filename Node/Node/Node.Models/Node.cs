@@ -24,7 +24,7 @@ namespace Node.Domain
         public ICryptoUtil CryptoUtil { get; set; }
         public ConcurrentBag<Peer> Peers { get; private set; }
 
-        private Block LastBlock
+        public Block LastBlock
         {
             get
             {
@@ -246,7 +246,6 @@ namespace Node.Domain
                     Block block = Block.ReCreateBlock(bm);
                     BlockChain.TryAdd(block.Index, block);
                 }
-
             }
 
             // remove mined transactions from pending transactions

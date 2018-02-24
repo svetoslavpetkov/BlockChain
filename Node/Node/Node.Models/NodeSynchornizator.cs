@@ -7,15 +7,17 @@ namespace Node.Domain
 {
     public interface INodeSynchornizator
     {
+        List<Peer> Peers { get; }
+
         List<Block> Sync();
         void BroadcastTransaction(Transaction tx);
         void BroadcastBlock(Block block);
         void AddNewlyConnectedPeer(Peer peer);
-        List<Peer> Peers { get; }
+        List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count);
     }
 
     public class NodeSynchornizator : INodeSynchornizator
-    {
+    {   
         private class NodeDetails
         {
             public string Name { get; set; }
@@ -81,6 +83,17 @@ namespace Node.Domain
         public void AddNewlyConnectedPeer(Peer peer)
         {
             Peers.Add(peer);
+        }
+
+        private BlockSyncApiModel Convert(Block b)
+        {
+            return null;
+          // return  Block.ReCreateBlock(b);
+        }
+
+        public List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count)
+        {
+            throw new NotImplementedException();
         }
     }
 }

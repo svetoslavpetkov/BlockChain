@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Node.Domain;
 
@@ -12,22 +9,24 @@ namespace Node.Controllers
     [Route("api/block")]
     public class BlockController : Controller
     {
+        private ITransactionQuery TransactionQuery { get; set; }
+        private IBlockQuery BlockQuery { get; set; }
         private Domain.Node Node { get; set; }
-        public BlockController(Domain.Node node)
+
+        public BlockController( ITransactionQuery transactionQuery, IBlockQuery blockQuery, Domain.Node node)
         {
+            TransactionQuery = transactionQuery;
+            BlockQuery = blockQuery;
             Node = node;
         }
 
         [HttpGet("{index}")]
         public IActionResult Get(int index)
         {
-            Block result;
-            bool success = Node.BlockChain.TryGetValue(index, out result);
+            BlockApiModel block = BlockQuery.Get(index);
 
-            if (success)
-            {
-                return Ok(Domain.ApiModels.BlockApiModel.FromBlock(result));
-            }
+            if (block != null)
+                return Ok(block);
 
             return NotFound($"Block with index {index} is not found");
         }
@@ -53,26 +52,19 @@ namespace Node.Controllers
         [HttpGet("last")]
         public IActionResult GetLastBlock()
         {
-            return Ok(Domain.ApiModels.BlockApiModel.FromBlock(Node.BlockChain[Node.BlockChain.Count - 1]));
+            BlockApiModel lastBlock = BlockQuery.GetLastBlock();
+
+            return Ok(lastBlock);
         }
 
         [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
-        public IActionResult GetBlocks(uint fromIndex, uint count)
+        public IActionResult GetBlocks(int fromIndex, int count)
         {
-            int from = (int)fromIndex;
-            int to = from + (int)count;
+            if(fromIndex < 0 || count < 0)
+                return BadRequest("'formIndex' and 'count' must be positive.");
 
-            //if (from < 0)
-            //{
-            //    return NotFound($"Blocks starting from index {from} are not existing");
-            //}
+            List<BlockApiModel> result = BlockQuery.GetBlocks(fromIndex, count);
 
-            //Itterate backwards
-            List<Domain.ApiModels.BlockApiModel> result = new List<Domain.ApiModels.BlockApiModel>();
-            for (int i = from; i > to; i--)
-            {
-                result.Add(Domain.ApiModels.BlockApiModel.FromBlock(Node.BlockChain[(int)i]));
-            }
             return Ok(result);
         }
 
