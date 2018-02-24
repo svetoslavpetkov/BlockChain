@@ -30,6 +30,7 @@ namespace Node.Domain
         {
             Peers = new List<Peer>();
             Current = currentNode;
+            SyncPeers();
         }
 
         private void SyncPeers()
