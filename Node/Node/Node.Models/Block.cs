@@ -49,7 +49,7 @@ namespace Node.Domain
 
         public void BlockMined(int nonce, string hash, string minerAddress)
         {
-            Nonce = Nonce;
+            Nonce = nonce;
             BlockHash = hash;
             MinedBy = minerAddress;
         }
