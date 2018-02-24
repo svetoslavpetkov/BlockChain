@@ -44,9 +44,8 @@ namespace Node
 
             services.AddSingleton<Domain.INodeSynchornizator>(s =>
             {
-                var httpContextAccessor = s.GetService<IHttpContextAccessor>();
-
-                return new Domain.NodeSynchornizator(new Domain.Peer("http://" + httpContextAccessor.HttpContext.Request.Host.Value, s.GetService<Domain.NodeInfo>().Name));
+                string url = Configuration.GetValue<string>("server.urls");
+                return new Domain.NodeSynchornizator(new Domain.Peer(url, s.GetService<Domain.NodeInfo>().Name));
             });
 
             services.AddSingleton<Domain.Node>();
