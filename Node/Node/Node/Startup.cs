@@ -48,6 +48,7 @@ namespace Node
 
                 return new Domain.NodeSynchornizator(new Domain.Peer("http://" + httpContextAccessor.HttpContext.Request.Host.Value, s.GetService<Domain.NodeInfo>().Name));
             });
+
             services.AddSingleton<Domain.Node>();
         }
 
@@ -58,6 +59,8 @@ namespace Node
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.ApplicationServices.GetService<Domain.INodeSynchornizator>().SyncPeers();
 
             app.UseCors("CorsPolicy");
 
