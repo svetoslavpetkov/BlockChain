@@ -168,7 +168,10 @@ namespace Node.Domain
 
             if (includeUncofirmed)
             {
-                result.AddRange(PendingTransactions.Where(t => t.FromAddress == address || t.ToAddress == address).ToList());
+                result.AddRange(PendingTransactions
+                    .Where(t => (t.FromAddress == address || t.ToAddress == address) 
+                            && (!onlySuccessful || t.TranserSuccessfull))
+                    .ToList());
             }
 
             return result;
