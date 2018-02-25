@@ -29,8 +29,20 @@ namespace Wallet.UI
                     }
                     else if (pressedKey.Key == ConsoleKey.Backspace)
                     {
-                        Console.Write("\b\0\b");
-                        result = result.Substring(0, result.Length - 1);
+                        if (result.Length == 0)
+                        {
+                            result = string.Empty;
+                        }
+                        else if (result.Length == 1)
+                        {
+                            result = string.Empty;
+                            Console.Write("\b\0\b");
+                        }
+                        else
+                        {
+                            Console.Write("\b\0\b");
+                            result = result.Substring(0, result.Length - 1);
+                        }
                     }
                     else
                     {

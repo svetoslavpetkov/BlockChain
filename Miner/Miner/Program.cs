@@ -14,7 +14,7 @@ namespace Miner
     {
         static void Main(string[] args)
         {
-            string minerAddress = "ohoboho13";
+            string minerAddress = "fb01e952e46e641ff3c74616541e292a0c11d455";
             string nodeAddress = "http://localhost:5555";
             TimeSpan timeLimit = new TimeSpan(0, 0, 5);
             Stopwatch sw = Stopwatch.StartNew();
