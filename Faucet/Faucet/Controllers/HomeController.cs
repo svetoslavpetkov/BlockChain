@@ -18,7 +18,7 @@ namespace Faucet.Controllers
     {
         public static Dictionary<string, DateTime> LastFaucetRequest = new Dictionary<string, DateTime>();
 
-        public static readonly SimpleWallet simpleWallet = new SimpleWallet("E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262");
+        public static readonly SimpleWallet simpleWallet = new SimpleWallet("45c6484ba7322e2667f28a015d7b6f4ccb1923c73c41d89c231f9d6456f3a12b");
 
         public static readonly TimeSpan MinRequestTime = TimeSpan.FromMinutes(5); 
 
