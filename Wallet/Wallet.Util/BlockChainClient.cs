@@ -33,15 +33,17 @@ namespace Wallet.Util
 
         bool MakePost<T>(string url, T postObject)
         {
-            using (HttpClient httpClient = new HttpClient())
-            {
-                string postContent = JsonConvert.SerializeObject(postObject);
-                var content = new StringContent(postContent, Encoding.UTF8, "application/json");
 
-                var result = httpClient.PostAsync(url, content).GetAwaiter().GetResult();
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string postContent = JsonConvert.SerializeObject(postObject);
+                    var content = new StringContent(postContent, Encoding.UTF8, "application/json");
 
-                return result.IsSuccessStatusCode;
-            }
+                    var result = httpClient.PostAsync(url, content).GetAwaiter().GetResult();
+                    result.EnsureSuccessStatusCode();
+                    return result.IsSuccessStatusCode;
+                }
+
         }
 
 

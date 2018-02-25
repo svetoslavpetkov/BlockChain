@@ -58,17 +58,25 @@ namespace Wallet.UI
             var account = Wallet.GetAccounts()[accountIndex];
             var transaction = account.Sign(receiverAddress, amount);
             ulong ballance = BlockChainClient.GetBalance(account.Address);
-
-            var result = BlockChainClient.SendTransaction(transaction);
-
-            if (result)
+            try
             {
-                Output.WriteSuccess("Money send to blockchain");
+                var result = BlockChainClient.SendTransaction(transaction);
+
+                if (result)
+                {
+                    Output.WriteSuccess("Money send to blockchain");
+                }
+                else
+                {
+                    Output.WriteError("Error sending the money");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Output.WriteError("Error sending the money");
+                Output.WriteError(ex.Message);
             }
+
+
             Input.EnterKey();
         }
 
