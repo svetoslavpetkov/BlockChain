@@ -1,4 +1,5 @@
 ﻿using BlockChain.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -55,6 +56,8 @@ namespace Node.Domain
                 {
                 }
             }
+
+            Console.WriteLine($"Peers found:{Peers.Count}");
         }
 
         public void Init(Peer peer)
@@ -85,6 +88,11 @@ namespace Node.Domain
                     NewBlockApiModel apiModel = new NewBlockApiModel();
                     apiModel.Block = BlockSyncApiModel.FromBlock(block);
                     apiModel.NodeAddress = Current.Url;
+
+                    var blData = JsonConvert.SerializeObject(apiModel);
+                    Console.WriteLine("Block for broadcast: " + blData);
+                    Console.WriteLine();
+                    Console.WriteLine();
 
                     client.Post("api/block/new", apiModel);
                 }

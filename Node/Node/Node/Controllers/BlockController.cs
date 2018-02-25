@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -6,7 +7,7 @@ using Node.Domain;
 
 namespace Node.Controllers
 {
-    
+
     [Produces("application/json")]
     [Route("api/block")]
     public class BlockController : ContorlerBase
@@ -27,7 +28,7 @@ namespace Node.Controllers
         {
             List<BlockSyncApiModel> blocks = BlockQuery.All();
             return AsJson(blocks);
-         
+
         }
 
         [HttpGet("{index}")]
@@ -45,7 +46,7 @@ namespace Node.Controllers
         public IActionResult GetBlockTransactions(int index)
         {
             IEnumerable<GetTransactionApiModel> txs = TransactionQuery.GetBlcokTransactions(index);
-              
+
             if (txs != null)
                 return AsJson(txs);
 
@@ -81,8 +82,13 @@ namespace Node.Controllers
         [HttpPost("new")]
         public void NewBlockFound([FromBody]NewBlockApiModel blockInfo)
         {
+            var blData = JsonConvert.SerializeObject(blockInfo);
+            Console.WriteLine("Block for sync: " + blData);
+            Console.WriteLine();
+            Console.WriteLine();
 
             Node.AttachBroadcastedBlock(blockInfo.Block, blockInfo.NodeAddress);
+
         }
     }
 }

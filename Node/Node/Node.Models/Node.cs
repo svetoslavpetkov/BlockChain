@@ -59,6 +59,8 @@ namespace Node.Domain
                 RevalidateBlock(b);
                 BlockChain.TryAdd(b.Index, b);
             }
+
+            Console.WriteLine("Node initialized. Synced finished.");
         }
 
         private void ValidateTransaction(Transaction transaction)
@@ -235,7 +237,7 @@ namespace Node.Domain
 
         private MiningContext BuildNewMinerJob(Block blockForMine)
         {
-            string prevBlockHash = LastBlock.BlockDataHash;
+            string prevBlockHash = LastBlock.BlockHash;
 
             MiningContext context = new MiningContext();
             context.BlockIndex = blockForMine.Index;
@@ -250,14 +252,13 @@ namespace Node.Domain
         private Block BuildBlock()
         {
             var lastBlock = BlockChain.Last().Value;
-            Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockDataHash, Difficulty);
-            //TODO: should transaction mney for the miner be explicitly included ?s
+            Block tempBlock = Block.BuildBlockForMiner(lastBlock.Index + 1, PendingTransactions.ToList(), lastBlock.BlockHash, Difficulty);
             return tempBlock;
         }
 
         public void AttachBroadcastedBlock(BlockSyncApiModel block, string nodeAddress)
         {
-            bool isPastBlock = block.Index <= LastBlock.Index;
+           bool isPastBlock = block.Index <= LastBlock.Index;
             if (isPastBlock)
                 return;
 
@@ -284,7 +285,7 @@ namespace Node.Domain
             }
             else
             {
-                bool isFutureBlock = LastBlock.BlockHash != block.PreviousBlockHash;
+                bool isFutureBlock = LastBlock.BlockHash != minedBlock.PreviousBlockHash;
                 if (isFutureBlock)
                     return;
 
