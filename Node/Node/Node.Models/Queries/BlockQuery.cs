@@ -37,11 +37,11 @@ namespace Node.Domain
 
         public BlockApiModel Get(int index)
         {
-            Block result;
-            bool success = Node.BlockChain.TryGetValue(index, out result);
-            BlockApiModel blockApiModel = BlockApiModel.FromBlock(result);
+            bool success = Node.BlockChain.TryGetValue(index, out Block result);
+            if (success)
+                return BlockApiModel.FromBlock(result);
 
-            return blockApiModel;
+            return null;
         }
 
         public List<BlockApiModel> All()
@@ -65,7 +65,7 @@ namespace Node.Domain
         {
             int endIndex = fromIndex + count;
             if (endIndex > Node.BlockChain.Count)
-                endIndex = Node.BlockChain.Count -1;
+                endIndex = Node.BlockChain.Count - 1;
 
             List<BlockApiModel> result = new List<BlockApiModel>();
             for (int i = fromIndex; i <= endIndex; i++)

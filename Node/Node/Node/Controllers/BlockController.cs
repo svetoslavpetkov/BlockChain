@@ -1,13 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Node.Domain;
 
 namespace Node.Controllers
 {
+    public class ContorlerBase : Controller
+    {
+        protected JsonResult AsJson(object data)
+        {
+            JsonSerializerSettings serializerSettings = 
+                new JsonSerializerSettings { Formatting = Formatting.Indented };
+            return Json(data, serializerSettings);
+        }
+    }
     [Produces("application/json")]
     [Route("api/block")]
-    public class BlockController : Controller
+    public class BlockController : ContorlerBase
     {
         private ITransactionQuery TransactionQuery { get; set; }
         private IBlockQuery BlockQuery { get; set; }
@@ -24,7 +34,8 @@ namespace Node.Controllers
         public IActionResult Get()
         {
             List<BlockApiModel> blocks = BlockQuery.All();
-            return Ok(blocks);
+            return AsJson(blocks);
+         
         }
 
         [HttpGet("{index}")]
@@ -33,7 +44,7 @@ namespace Node.Controllers
             BlockApiModel block = BlockQuery.Get(index);
 
             if (block != null)
-                return Ok(block);
+                return AsJson(block);
 
             return NotFound($"Block with index {index} is not found");
         }
