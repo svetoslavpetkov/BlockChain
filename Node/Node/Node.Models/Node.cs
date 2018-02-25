@@ -261,10 +261,6 @@ namespace Node.Domain
             if (isPastBlock)
                 return;
 
-            bool isFutureBlock = LastBlock.BlockHash != block.PreviousBlockHash;
-            if (isFutureBlock)
-                return;
-
             Block minedBlock = Block.ReCreateBlock(block);
             ValidateBlockHash(minedBlock, minedBlock.Nonce, minedBlock.BlockHash);
 
@@ -288,6 +284,10 @@ namespace Node.Domain
             }
             else
             {
+                bool isFutureBlock = LastBlock.BlockHash != block.PreviousBlockHash;
+                if (isFutureBlock)
+                    return;
+
                 RevalidateBlock(minedBlock);
 
                 // remove mined transactions from pending transactions
