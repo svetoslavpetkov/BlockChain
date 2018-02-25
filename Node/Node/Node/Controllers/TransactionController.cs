@@ -26,6 +26,11 @@ namespace Node.Controllers
                 Node.AddTransaction(transaction);
                 return Ok();
             }
+            catch(AddressNotValidException ex)
+            {
+                return BadRequest(new ResponseDetails { Error = ex.Message.ToString() });
+
+            }
             catch (BalanceNotEnoughException ex)
             {
                 return BadRequest(new ResponseDetails { Error = ex.Message.ToString() });
