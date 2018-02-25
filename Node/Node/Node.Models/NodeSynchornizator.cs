@@ -107,7 +107,7 @@ namespace Node.Domain
         public List<Block> GetBlocksForSync(int startIndex, int count, string nodeAddress)
         {
             RestClient client = new RestClient(nodeAddress);
-            var blockModels = client.Get<List<BlockSyncApiModel>>($"api/getblocksByFromIndexAndCount/{startIndex}/{count}");
+            var blockModels = client.Get<List<BlockSyncApiModel>>($"api/block/getblocksByFromIndexAndCount/{startIndex}/{count}");
             List<Block> blocks = new List<Block>();
 
             foreach (var bm in blockModels)
