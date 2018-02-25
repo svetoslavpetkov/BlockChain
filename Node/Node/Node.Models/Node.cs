@@ -83,10 +83,11 @@ namespace Node.Domain
                 throw new TransactionNotValidException("Provided address is not valid.");
 
             ulong senderBalance = CalculateBalance(transaction.FromAddress, true, true);
+            transaction.TranserSuccessfull = senderBalance >= transaction.Amount;
 
             PendingTransactions.Add(transaction);
 
-            if (senderBalance < transaction.Amount)
+            if (!transaction.TranserSuccessfull)
                 throw new BalanceNotEnough($"Transaction amount ({transaction.Amount}) is more than sender balance({senderBalance})");
         }
 
@@ -97,14 +98,7 @@ namespace Node.Domain
                 return;
 
             ValidateBlockHash(block, nonce, hash);
-
             block.BlockMined(nonce, hash, minerAddress);
-
-            foreach (var transaction in block.Transactions)
-            {
-                decimal balance = GetBalance(transaction.FromAddress);
-                transaction.TranserSuccessfull = balance >= transaction.Amount;
-            }
 
             int minedTransactionsCount = block.Transactions.Count;
 
@@ -134,7 +128,7 @@ namespace Node.Domain
             return CalculateBalance(address, false, true);
         }
 
-        private ulong CalculateBalance(string address, bool includeUncomfirmed = false, 
+        private ulong CalculateBalance(string address, bool includeUncomfirmed = false,
             bool onlySuccessful = false)
         {
             //Get transaction balances
@@ -254,6 +248,7 @@ namespace Node.Domain
 
                 foreach (var bl in forkedBlocks)
                     BlockChain.TryAdd(bl.Index, bl);
+
                 List<string> blockTxs = forkedBlocks.SelectMany(b => b.Transactions).Select(t => t.TransactionHash).ToList();
 
                 PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.
@@ -267,8 +262,6 @@ namespace Node.Domain
 
                 BlockChain.TryAdd(minedBlock.Index, minedBlock);
             }
-
-
         }
     }
 }
