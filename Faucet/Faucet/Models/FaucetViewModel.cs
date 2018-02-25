@@ -11,6 +11,7 @@ namespace Faucet.Models
 
         public string ReceiverAddrees { get; set; }
 
+        public string FaucetBallance { get; set; }
 
         public string SuccessMessage { get; set; }
         public string ErrorMessage { get; set; }

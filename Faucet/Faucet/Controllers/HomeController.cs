@@ -20,7 +20,9 @@ namespace Faucet.Controllers
 
         public static readonly SimpleWallet simpleWallet = new SimpleWallet("45c6484ba7322e2667f28a015d7b6f4ccb1923c73c41d89c231f9d6456f3a12b");
 
-        public static readonly TimeSpan MinRequestTime = TimeSpan.FromMinutes(5); 
+        public static readonly TimeSpan MinRequestTime = TimeSpan.FromMinutes(5);
+
+        private const string NodeAddress = "http://localhost:5555";
 
         private IHttpContextAccessor _httpContextAccessor;
 
@@ -33,7 +35,8 @@ namespace Faucet.Controllers
         public IActionResult Index()
         {
             FaucetViewModel model = new FaucetViewModel() {
-                FaucetAddrees = simpleWallet.Address.ToLower()
+                FaucetAddrees = simpleWallet.Address.ToLower(),
+                FaucetBallance = GetBallance()
             };
             return View(model);
         }
@@ -54,7 +57,7 @@ namespace Faucet.Controllers
 
                 var transaction = simpleWallet.Sign(model.ReceiverAddrees, 5 * Token.OneToken);
 
-                var result = MakePost("http://localhost:5555/api/transaction/new", transaction);
+                var result = MakePost(NodeAddress + "/api/transaction/new", transaction);
 
                 if (result)
                 {
@@ -75,7 +78,7 @@ namespace Faucet.Controllers
                 model.ErrorMessage = "Error occured. No money. Sorry";
             }
 
-
+            model.FaucetBallance = GetBallance();
             return View(model);
         }
 
@@ -113,6 +116,20 @@ namespace Faucet.Controllers
                 T responceData = JsonConvert.DeserializeObject<T>(json);
 
                 return responceData;
+            }
+        }
+
+
+        public string GetBallance()
+        {
+            try
+            {
+                var ballance = Get<ulong>(NodeAddress + $"/api/account/{simpleWallet.Address}/ballance");
+                return ballance.GetFormattedTokens();
+            }
+            catch (Exception ex)
+            {
+                return "unknown";
             }
         }
 
