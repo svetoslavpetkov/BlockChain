@@ -54,13 +54,7 @@ namespace Node.Domain
             Started = DateTime.Now;
         }
 
-        public ulong GetBalance(string address)
-        {
-            ulong balance = CalculateBalance(address);
-            return balance;
-        }
-
-        public void AddTransaction(Core.Transaction transaction)
+        public void AddTransaction(Transaction transaction)
         {
             if (transaction == null)
                 throw new ArgumentException("'transaction' object cannot be null");
@@ -88,8 +82,12 @@ namespace Node.Domain
             if (address != transaction.FromAddress)
                 throw new TransactionNotValidException("Provided address is not valid.");
 
+            ulong senderBalance = CalculateBalance(transaction.FromAddress, true, true);
+
             PendingTransactions.Add(transaction);
-            NodeSynchornizator.BroadcastTransaction(transaction);
+
+            if (senderBalance < transaction.Amount)
+                throw new BalanceNotEnough($"Transaction amount ({transaction.Amount}) is more than sender balance({senderBalance})");
         }
 
         public void NonceFound(string minerAddress, int nonce, string hash)
@@ -104,7 +102,7 @@ namespace Node.Domain
 
             foreach (var transaction in block.Transactions)
             {
-                decimal balance = CalculateBalance(transaction.FromAddress);
+                decimal balance = GetBalance(transaction.FromAddress);
                 transaction.TranserSuccessfull = balance >= transaction.Amount;
             }
 
@@ -131,10 +129,16 @@ namespace Node.Domain
             }
         }
 
-        private ulong CalculateBalance(string address)
+        public ulong GetBalance(string address)
+        {
+            return CalculateBalance(address, false, true);
+        }
+
+        private ulong CalculateBalance(string address, bool includeUncomfirmed = false, 
+            bool onlySuccessful = false)
         {
             //Get transaction balances
-            var addressTransactions = GetTransactions(address);
+            var addressTransactions = GetTransactions(address, includeUncomfirmed, onlySuccessful);
             ulong balance = 0;
             foreach (var tx in addressTransactions)
             {
@@ -157,9 +161,16 @@ namespace Node.Domain
             return balance + minedBlokcs;
         }
 
-        internal ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false)
+        internal ICollection<Transaction> GetTransactions(string address, bool includeUncofirmed = false, bool onlySuccessful = false)
         {
-            var result = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address).ToList();
+            var query = BlockChain.SelectMany(b => b.Value.Transactions).Where(t => t.FromAddress == address || t.ToAddress == address);
+
+            if (onlySuccessful)
+            {
+                query = query.Where(t => t.TranserSuccessfull);
+            }
+
+            var result = query.ToList();
 
             if (includeUncofirmed)
             {
@@ -243,7 +254,7 @@ namespace Node.Domain
 
                 foreach (var bl in forkedBlocks)
                     BlockChain.TryAdd(bl.Index, bl);
-                List<string> blockTxs = forkedBlocks.SelectMany(b => b.Transactions).Select(t =>t.TransactionHash).ToList();
+                List<string> blockTxs = forkedBlocks.SelectMany(b => b.Transactions).Select(t => t.TransactionHash).ToList();
 
                 PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.
                     Where(t => !blockTxs.Contains(t.TransactionHash)));
@@ -257,7 +268,7 @@ namespace Node.Domain
                 BlockChain.TryAdd(minedBlock.Index, minedBlock);
             }
 
-            
+
         }
     }
 }
