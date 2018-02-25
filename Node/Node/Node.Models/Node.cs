@@ -88,7 +88,7 @@ namespace Node.Domain
             PendingTransactions.Add(transaction);
 
             if (!transaction.TranserSuccessfull)
-                throw new BalanceNotEnough($"Transaction amount ({transaction.Amount}) is more than sender balance({senderBalance})");
+                throw new BalanceNotEnoughException($"Address '{transaction.FromAddress}' trying to send {transaction.Amount.GetFormattedTokens()}, but balance is {senderBalance.GetFormattedTokens()}");
         }
 
         public void NonceFound(string minerAddress, int nonce, string hash)
