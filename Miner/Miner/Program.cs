@@ -15,7 +15,7 @@ namespace Miner
         static void Main(string[] args)
         {
             string minerAddress = "ohoboho13";
-            string nodeAddress = "http://localhost:5556";
+            string nodeAddress = "http://localhost:5555";
             TimeSpan timeLimit = new TimeSpan(0, 0, 5);
             Stopwatch sw = Stopwatch.StartNew();
             BlockInput input = Get<BlockInput>(nodeAddress + "/api/mining/getBockForMine/" + minerAddress);
