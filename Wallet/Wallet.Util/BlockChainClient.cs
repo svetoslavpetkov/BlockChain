@@ -40,7 +40,15 @@ namespace Wallet.Util
                     var content = new StringContent(postContent, Encoding.UTF8, "application/json");
 
                     var result = httpClient.PostAsync(url, content).GetAwaiter().GetResult();
-                    result.EnsureSuccessStatusCode();
+
+                    if (!result.IsSuccessStatusCode)
+                    {
+                        var message = result.Content.ReadAsStringAsync().Result;
+                        var resDetails =  JsonConvert.DeserializeObject<ResponseDetails>(message);
+
+                        throw new Exception(resDetails.Error);
+                    }
+
                     return result.IsSuccessStatusCode;
                 }
 

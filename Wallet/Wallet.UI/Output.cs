@@ -13,7 +13,7 @@ namespace Wallet.UI
 
         public static void WriteError(string message)
         {
-            Write(message, ConsoleColor.Red, ConsoleColor.White);
+            Write(message, ConsoleColor.Red, ConsoleColor.Black);
         }
 
         public static void WriteSuccess(string message)
