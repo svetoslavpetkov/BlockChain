@@ -24,7 +24,7 @@ namespace Node.Domain
         public List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count)
         {
             List<BlockSyncApiModel> blocks = new List<BlockSyncApiModel>();
-            int endIndex = fromIndex + count;
+            int endIndex = fromIndex + count - 1;
 
             if (endIndex > Node.BlockChain.Count)
                 endIndex = Node.BlockChain.Count;

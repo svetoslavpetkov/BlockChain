@@ -59,8 +59,6 @@ namespace Node
                 app.UseDeveloperExceptionPage();
             }
 
-            app.ApplicationServices.GetService<Domain.INodeSynchornizator>().SyncPeers();
-
             app.UseCors("CorsPolicy");
 
             app.UseMvc();

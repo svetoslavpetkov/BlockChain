@@ -13,8 +13,9 @@ namespace Node.Domain
         void BroadcastTransaction(Transaction tx);
         void BroadcastBlock(Block block);
         PeerApiModel AddNewlyConnectedPeer(PeerApiModel peer);
-        List<Block> GetBlocksForSync(int startIndex, int count, string nodeAddress);
+        List<Block> GetBlocksForSync(string nodeAddress);
         void SyncPeers();
+        List<Block> SyncBlocks();
     }
 
     public class NodeSynchornizator : INodeSynchornizator
@@ -104,14 +105,33 @@ namespace Node.Domain
             return PeerApiModel.FromPeer(Current);
         }
 
-        public List<Block> GetBlocksForSync(int startIndex, int count, string nodeAddress)
+        public List<Block> GetBlocksForSync(string nodeAddress)
         {
             RestClient client = new RestClient(nodeAddress);
-            var blockModels = client.Get<List<BlockSyncApiModel>>($"api/getblocksByFromIndexAndCount/{startIndex}/{count}");
+            var blockModels = client.Get<List<BlockSyncApiModel>>($"api/block");
             List<Block> blocks = new List<Block>();
 
-            foreach (var bm in blockModels)
-                blocks.Add(Block.ReCreateBlock(bm));
+            if(blockModels.Count > 1)
+            for (int i = 1; i < blockModels.Count; i++)
+                blocks.Add(Block.ReCreateBlock(blockModels[i]));
+
+            return blocks;
+        }
+
+        public List<Block> SyncBlocks()
+        {
+            SyncPeers();
+            List<Block> blocks = new List<Block>();
+            foreach (Peer p in Peers)
+            {
+                try
+                {
+                   List<Block> peerBlock =  GetBlocksForSync(p.Url);
+                    if (blocks.Count < peerBlock.Count)
+                        blocks = peerBlock;
+                }
+                catch (Exception ex) { }
+            }
 
             return blocks;
         }

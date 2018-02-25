@@ -260,7 +260,7 @@ namespace Node.Domain
             if (nodeDifference >= 6)
             {
                 int startIndex = minedBlock.Index - nodeDifference;
-                List<Block> forkedBlocks = NodeSynchornizator.GetBlocksForSync(startIndex, nodeDifference, nodeAddress);
+                List<Block> forkedBlocks = NodeSynchornizator.GetBlocksForSync(nodeAddress);
 
                 foreach (var bl in forkedBlocks)
                 {

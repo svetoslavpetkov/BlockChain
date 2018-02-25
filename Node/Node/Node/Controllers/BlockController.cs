@@ -6,15 +6,7 @@ using Node.Domain;
 
 namespace Node.Controllers
 {
-    public class ContorlerBase : Controller
-    {
-        protected JsonResult AsJson(object data)
-        {
-            JsonSerializerSettings serializerSettings = 
-                new JsonSerializerSettings { Formatting = Formatting.Indented };
-            return Json(data, serializerSettings);
-        }
-    }
+    
     [Produces("application/json")]
     [Route("api/block")]
     public class BlockController : ContorlerBase
@@ -53,9 +45,9 @@ namespace Node.Controllers
         public IActionResult GetBlockTransactions(int index)
         {
             IEnumerable<GetTransactionApiModel> txs = TransactionQuery.GetBlcokTransactions(index);
-
+              
             if (txs != null)
-                return Ok(txs);
+                return AsJson(txs);
 
             return NotFound($"Block with index {index} is not found");
         }
