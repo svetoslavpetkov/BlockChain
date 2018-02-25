@@ -14,7 +14,8 @@ namespace Node.Domain
         PeerApiModel AddNewlyConnectedPeer(PeerApiModel peer);
         List<Block> GetBlocksForSync(string nodeAddress);
         List<Block> SyncBlocks();
-
+        void ClearPeers();
+        void SyncPeers();
     }
 
     public class NodeSynchornizator : INodeSynchornizator
@@ -33,7 +34,7 @@ namespace Node.Domain
             Current = currentNode;
         }
 
-        private void SyncPeers()
+        public void SyncPeers()
         {
             for (int port = 5555; port < 5560; port++)
             {
@@ -128,6 +129,11 @@ namespace Node.Domain
             }
 
             return blocks;
+        }
+
+        public void ClearPeers()
+        {
+            Peers.Clear();
         }
     }
 }

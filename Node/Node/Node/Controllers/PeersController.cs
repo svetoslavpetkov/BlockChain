@@ -22,6 +22,20 @@ namespace Node.Controllers
             return Ok(NodeSynchornizator.Peers.Select(p => PeerApiModel.FromPeer(p)).ToList());
         }
 
+        [HttpPost("clear")]
+        public IActionResult Clear()
+        {
+            NodeSynchornizator.ClearPeers();
+            return Ok();
+        }
+
+        [HttpPost("sync")]
+        public IActionResult Sync()
+        {
+            NodeSynchornizator.SyncPeers();
+            return Ok();
+        }
+
         [HttpPost("connect")]
         public PeerApiModel Connect([FromBody] PeerApiModel peer)
         {
