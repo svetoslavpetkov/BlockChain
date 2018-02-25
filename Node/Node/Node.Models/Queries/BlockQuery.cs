@@ -6,6 +6,7 @@ namespace Node.Domain
     public interface IBlockQuery
     {
         BlockApiModel Get(int index);
+        List<BlockApiModel> All();
         BlockApiModel GetLastBlock();
         List<BlockApiModel> GetBlocks(int fromIndex, int count);
         List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count);
@@ -41,6 +42,16 @@ namespace Node.Domain
             BlockApiModel blockApiModel = BlockApiModel.FromBlock(result);
 
             return blockApiModel;
+        }
+
+        public List<BlockApiModel> All()
+        {
+            List<BlockApiModel> blocks = new List<BlockApiModel>();
+            foreach (var b in Node.BlockChain)
+                blocks.Add(BlockApiModel.FromBlock(b.Value));
+            blocks = blocks.OrderByDescending(b => b.Index).ToList();
+
+            return blocks;
         }
 
         public BlockApiModel GetLastBlock()

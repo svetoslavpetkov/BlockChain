@@ -61,13 +61,51 @@ namespace Node.Domain
             {
                 Transactions = new List<Transaction>()
                 {
-                    new Transaction() { FromAddress="GENESIS_Stefan_1" ,ToAddress="ee3c658d76b14e45105372e0f1d1748264abf0a7",Amount=10000 * Token.OneToken,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_010101010101010101" },
-                    new Transaction() { FromAddress="GENESIS_Stefan_2" ,ToAddress="784c1322bff16516c470d320c71507289e3c6db9",Amount=10000 * Token.OneToken,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_020202020202020202" },
-
-                     new Transaction() { FromAddress="GENESIS_Svetoslav_1" ,ToAddress="11b4db825c1289cfa51ed80b7fa41c53d2548dc9",Amount=10000 * Token.OneToken,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_010101010101010101" },
-                    new Transaction() { FromAddress="GENESIS_Svetoslav_2" ,ToAddress="cb25c40588a12d9179a9e1343b9be275ea90cee3",Amount=10000 * Token.OneToken,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_020202020202020202" },
-
-                     new Transaction() { FromAddress="Faucet" ,ToAddress="11c238ce2c4aa933f109c269157a30637372f815",Amount= 10000000 * Token.OneToken,DateCreated = now.AddDays(-10), TransactionHash="GENESIS_020202020202020202" }
+                    new Transaction()
+                    {
+                        FromAddress = "GENESIS_Stefan_1" ,
+                        ToAddress ="ee3c658d76b14e45105372e0f1d1748264abf0a7",
+                        Amount =10000 * Token.OneToken,
+                        DateCreated = now.AddDays(-10),
+                        TransactionHash ="GENESIS_010101010101010101",
+                        TranserSuccessfull = true
+                    },
+                    new Transaction()
+                    {
+                        FromAddress ="GENESIS_Stefan_2",
+                        ToAddress ="784c1322bff16516c470d320c71507289e3c6db9",
+                        Amount =10000 * Token.OneToken,
+                        DateCreated = now.AddDays(-10),
+                        TransactionHash ="GENESIS_020202020202020202",
+                        TranserSuccessfull = true
+                    },
+                     new Transaction()
+                     {
+                         FromAddress ="GENESIS_Svetoslav_1",
+                         ToAddress ="11b4db825c1289cfa51ed80b7fa41c53d2548dc9",
+                         Amount =10000 * Token.OneToken,
+                         DateCreated = now.AddDays(-10),
+                         TransactionHash ="GENESIS_44410101010101010101",
+                         TranserSuccessfull = true
+                     },
+                    new Transaction()
+                    {
+                        FromAddress ="GENESIS_Svetoslav_2",
+                        ToAddress ="cb25c40588a12d9179a9e1343b9be275ea90cee3",
+                        Amount =10000 * Token.OneToken,
+                        DateCreated = now.AddDays(-10),
+                        TransactionHash ="GENESIS_5550202020202020202",
+                        TranserSuccessfull = true
+                    },
+                     new Transaction()
+                     {
+                         FromAddress ="Faucet",
+                         ToAddress ="11c238ce2c4aa933f109c269157a30637372f815",
+                         Amount = 10000000 * Token.OneToken,
+                         DateCreated = now.AddDays(-10),
+                         TransactionHash ="GENESIS_06660202020202020202",
+                         TranserSuccessfull = true
+                     }
                 },
                 CreatedDate = DateTime.UtcNow,
                 Difficulty = difficulty,

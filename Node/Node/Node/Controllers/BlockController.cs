@@ -13,11 +13,18 @@ namespace Node.Controllers
         private IBlockQuery BlockQuery { get; set; }
         private Domain.Node Node { get; set; }
 
-        public BlockController( ITransactionQuery transactionQuery, IBlockQuery blockQuery, Domain.Node node)
+        public BlockController(ITransactionQuery transactionQuery, IBlockQuery blockQuery, Domain.Node node)
         {
             TransactionQuery = transactionQuery;
             BlockQuery = blockQuery;
             Node = node;
+        }
+
+        [HttpGet()]
+        public IActionResult Get()
+        {
+            List<BlockApiModel> blocks = BlockQuery.All();
+            return Ok(blocks);
         }
 
         [HttpGet("{index}")]
@@ -34,7 +41,7 @@ namespace Node.Controllers
         [HttpGet("{index}/transactions")]
         public IActionResult GetBlockTransactions(int index)
         {
-            IEnumerable < GetTransactionApiModel > txs =  TransactionQuery.GetBlcokTransactions(index);
+            IEnumerable<GetTransactionApiModel> txs = TransactionQuery.GetBlcokTransactions(index);
 
             if (txs != null)
                 return Ok(txs);
@@ -53,7 +60,7 @@ namespace Node.Controllers
         [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
         public IActionResult GetBlocks(int fromIndex, int count)
         {
-            if(fromIndex < 0 || count < 0)
+            if (fromIndex < 0 || count < 0)
                 return BadRequest("'formIndex' and 'count' must be positive.");
 
             List<BlockApiModel> result = BlockQuery.GetBlocks(fromIndex, count);
@@ -72,7 +79,7 @@ namespace Node.Controllers
         public void NewBlockFound([FromBody]NewBlockApiModel blockInfo)
         {
 
-            Node.AttachBroadcastedBlock(blockInfo.Block,blockInfo.NodeAddress);
+            Node.AttachBroadcastedBlock(blockInfo.Block, blockInfo.NodeAddress);
         }
     }
 }
