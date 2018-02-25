@@ -25,7 +25,7 @@ namespace Node.Controllers
         [HttpGet()]
         public IActionResult Get()
         {
-            List<BlockApiModel> blocks = BlockQuery.All();
+            List<BlockSyncApiModel> blocks = BlockQuery.All();
             return AsJson(blocks);
          
         }
