@@ -9,13 +9,12 @@ namespace Node.Domain
     {
         List<Peer> Peers { get; }
 
-        List<Block> Sync();
         void BroadcastTransaction(Transaction tx);
         void BroadcastBlock(Block block);
         PeerApiModel AddNewlyConnectedPeer(PeerApiModel peer);
         List<Block> GetBlocksForSync(string nodeAddress);
-        void SyncPeers();
         List<Block> SyncBlocks();
+
     }
 
     public class NodeSynchornizator : INodeSynchornizator
@@ -34,7 +33,7 @@ namespace Node.Domain
             Current = currentNode;
         }
 
-        public void SyncPeers()
+        private void SyncPeers()
         {
             for (int port = 5555; port < 5560; port++)
             {
@@ -60,11 +59,6 @@ namespace Node.Domain
         public void Init(Peer peer)
         {
             Current = peer;
-        }
-
-        public List<Block> Sync()
-        {
-            return null;
         }
 
         public void BroadcastTransaction(Transaction tx)

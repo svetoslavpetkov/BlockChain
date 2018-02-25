@@ -257,7 +257,12 @@ namespace Node.Domain
 
         public void AttachBroadcastedBlock(BlockSyncApiModel block, string nodeAddress)
         {
-            if (block.Index <= LastBlock.Index)
+            bool isPastBlock = block.Index <= LastBlock.Index;
+            if (isPastBlock)
+                return;
+
+            bool isFutureBlock = LastBlock.BlockHash != block.PreviousBlockHash;
+            if (isFutureBlock)
                 return;
 
             Block minedBlock = Block.ReCreateBlock(block);
@@ -273,7 +278,7 @@ namespace Node.Domain
                 foreach (var bl in forkedBlocks)
                 {
                     RevalidateBlock(bl);
-                    BlockChain.TryAdd(bl.Index, bl);
+                    BlockChain.AddOrUpdate(bl.Index, bl, (index, curBlock) => { return bl; });
                 }
 
                 List<string> blockTxs = forkedBlocks.SelectMany(b => b.Transactions).Select(t => t.TransactionHash).ToList();
