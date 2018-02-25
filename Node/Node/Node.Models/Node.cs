@@ -51,6 +51,8 @@ namespace Node.Domain
             BlockChain.TryAdd(0, genesisBlock);
 
             Started = DateTime.Now;
+
+            NodeSynchornizator.SyncBlocks();
         }
 
         private void ValidateTransaction(Transaction transaction)
