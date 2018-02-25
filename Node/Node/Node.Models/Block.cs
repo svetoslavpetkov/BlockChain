@@ -47,6 +47,14 @@ namespace Node.Domain
             return hash;
         }
 
+        public bool IsDataValid()
+        {
+            string hash = GetHash();
+            bool isValid = hash == BlockDataHash;
+
+            return isValid;
+        }
+
         public void BlockMined(int nonce, string hash, string minerAddress)
         {
             Nonce = nonce;

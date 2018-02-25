@@ -54,7 +54,7 @@ namespace Node.Domain
             Started = DateTime.Now;
         }
 
-        public void AddTransaction(Transaction transaction)
+        private void ValidateTransaction(Transaction transaction)
         {
             if (transaction == null)
                 throw new ArgumentException("'transaction' object cannot be null");
@@ -81,6 +81,11 @@ namespace Node.Domain
             string address = TransactionValidator.GetAddress(transaction.SenderPublicKey);
             if (address != transaction.FromAddress)
                 throw new TransactionNotValidException("Provided address is not valid.");
+        }
+
+        public void AddTransaction(Transaction transaction)
+        {
+            ValidateTransaction(transaction);
 
             ulong senderBalance = CalculateBalance(transaction.FromAddress, true, true);
             transaction.TranserSuccessfull = senderBalance >= transaction.Amount;
@@ -236,11 +241,11 @@ namespace Node.Domain
 
         public void AttachBroadcastedBlock(BlockSyncApiModel block, string nodeAddress)
         {
+            if (block.Index <= LastBlock.Index)
+                return;
+
             Block minedBlock = Block.ReCreateBlock(block);
             ValidateBlockHash(minedBlock, minedBlock.Nonce, minedBlock.BlockHash);
-
-            if (minedBlock.Index <= LastBlock.Index)
-                return;
 
             // replace blockchain if another blockain is longer
             int nodeDifference = minedBlock.Index - BlockChain.Count;
@@ -250,7 +255,10 @@ namespace Node.Domain
                 List<Block> forkedBlocks = NodeSynchornizator.GetBlocksForSync(startIndex, nodeDifference, nodeAddress);
 
                 foreach (var bl in forkedBlocks)
+                {
+                    RevalidateBlockOnSync(bl);
                     BlockChain.TryAdd(bl.Index, bl);
+                }
 
                 List<string> blockTxs = forkedBlocks.SelectMany(b => b.Transactions).Select(t => t.TransactionHash).ToList();
 
@@ -259,11 +267,28 @@ namespace Node.Domain
             }
             else
             {
+                RevalidateBlockOnSync(minedBlock);
+
                 // remove mined transactions from pending transactions
                 List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();
                 PendingTransactions = new ConcurrentBag<Transaction>(PendingTransactions.Where(t => !minedTxIds.Contains(t.TransactionHash)).ToList());
 
                 BlockChain.TryAdd(minedBlock.Index, minedBlock);
+            }
+        }
+
+        private void RevalidateBlockOnSync(Block b)
+        {
+            if (!b.IsDataValid())
+                throw new ArgumentException($"Block datac changed by middle man.Index={b.Index}");
+
+            foreach (var tx in b.Transactions)
+            {
+                ValidateTransaction(tx);
+                ulong senderBalance = CalculateBalance(tx.FromAddress, false, true);
+                bool isSuccesfullRevalidate = senderBalance >= tx.Amount;
+                if (tx.TranserSuccessfull != isSuccesfullRevalidate)
+                    throw new ArgumentException($"Block not valid. Transaction {tx.TransactionHash} changedby middle man.");
             }
         }
     }
