@@ -1,5 +1,4 @@
 ﻿using BlockChain.Core;
-using Node.Domain.Exceptions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,21 +9,21 @@ namespace Node.Domain
 {
     public class Node
     {
-        public NodeInfo NodeInfo { get; private set; }
-        public DateTime Started { get; set; }
-        public ConcurrentDictionary<int, Block> BlockChain { get; private set; }
+        internal NodeInfo NodeInfo { get; private set; }
+        internal DateTime Started { get; set; }
+        internal ConcurrentDictionary<int, Block> BlockChain { get; private set; }
         internal ConcurrentBag<Core.Transaction> PendingTransactions { get; private set; }
         private ConcurrentDictionary<string, Block> MiningJobs { get; set; }
-        public int Difficulty { get; private set; }
-        private ConcurrentDictionary<string, Block> BlocksInProgress { get; set; }
+        internal int Difficulty { get; private set; }
+        internal ConcurrentDictionary<string, Block> BlocksInProgress { get; set; }
+        internal ConcurrentBag<Peer> Peers { get; private set; }
 
-        public ITransactionValidator TransactionValidator { get; set; }
+        private ITransactionValidator TransactionValidator { get; set; }
         private INodeSynchornizator NodeSynchornizator { get; set; }
         private IProofOfWork ProofOfWork { get; set; }
-        public ICryptoUtil CryptoUtil { get; set; }
-        public ConcurrentBag<Peer> Peers { get; private set; }
+        private ICryptoUtil CryptoUtil { get; set; }
 
-        public Block LastBlock
+        internal Block LastBlock
         {
             get
             {
@@ -56,6 +55,12 @@ namespace Node.Domain
 
         private void ValidateTransaction(Transaction transaction)
         {
+            if (!CryptoUtil.IsAddressValid(transaction.FromAddress))
+                throw new AddressNotValidException($"{transaction.FromAddress} is not valid address");
+
+            if (!CryptoUtil.IsAddressValid(transaction.ToAddress))
+                throw new AddressNotValidException($"{transaction.ToAddress} is not valid address");
+
             if (transaction == null)
                 throw new ArgumentException("'transaction' object cannot be null");
 
@@ -101,6 +106,9 @@ namespace Node.Domain
             Block block = BlocksInProgress[minerAddress];
             if (block == null)
                 return;
+
+            if (!CryptoUtil.IsAddressValid(minerAddress))
+                throw new AddressNotValidException($"Miner address '{minerAddress}' is not valid");
 
             ValidateBlockHash(block, nonce, hash);
             block.BlockMined(nonce, hash, minerAddress);
@@ -174,7 +182,7 @@ namespace Node.Domain
             if (includeUncofirmed)
             {
                 result.AddRange(PendingTransactions
-                    .Where(t => (t.FromAddress == address || t.ToAddress == address) 
+                    .Where(t => (t.FromAddress == address || t.ToAddress == address)
                             && (!onlySuccessful || t.TranserSuccessfull))
                     .ToList());
             }

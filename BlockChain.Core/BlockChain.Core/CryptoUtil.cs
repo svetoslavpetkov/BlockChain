@@ -10,6 +10,7 @@ using System.Text;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Security;
+using System.Text.RegularExpressions;
 
 namespace BlockChain.Core
 {
@@ -111,6 +112,14 @@ namespace BlockChain.Core
             BigInteger biInt = new BigInteger(compressedPoint);
 
             return biInt.ToString(16);
+        }
+
+        public bool IsAddressValid(string address)
+        {
+            Regex reg = new Regex("^[0-9a-f]{40}$");
+            bool isValid = reg.IsMatch(address);
+
+            return isValid;
         }
     }
 }

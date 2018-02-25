@@ -20,5 +20,7 @@ namespace BlockChain.Core
         string RecoverPrivateKey(string seed);
 
         string GetHexString(byte[] bytes);
+
+        bool IsAddressValid(string address);
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BlockChain.Core
+namespace Node.Domain
 {
    public class BalanceNotEnoughException : Exception
     {
