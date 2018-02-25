@@ -28,7 +28,7 @@ namespace Node.Controllers
             }
             catch (BalanceNotEnoughException ex)
             {
-               return BadRequest(ex.Message);
+                return BadRequest(new { Error = ex.Message.ToString() });
             }
 
         }
