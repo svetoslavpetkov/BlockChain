@@ -19,9 +19,18 @@ namespace Node.Controllers
         }
 
         [HttpPost("new")]
-        public void New([FromBody]Transaction transaction)
+        public IActionResult New([FromBody]Transaction transaction)
         {
-            Node.AddTransaction(transaction);
+            try
+            {
+                Node.AddTransaction(transaction);
+                return Ok();
+            }
+            catch (BalanceNotEnoughException ex)
+            {
+               return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpGet("{tx}")]
