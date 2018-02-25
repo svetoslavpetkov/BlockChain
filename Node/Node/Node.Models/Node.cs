@@ -52,7 +52,13 @@ namespace Node.Domain
 
             Started = DateTime.Now;
 
-            NodeSynchornizator.SyncBlocks();
+           var missedBlocks =  NodeSynchornizator.SyncBlocks();
+
+            foreach (var b in missedBlocks)
+            {
+                RevalidateBlock(b);
+                BlockChain.TryAdd(b.Index, b);
+            }
         }
 
         private void ValidateTransaction(Transaction transaction)
@@ -266,7 +272,7 @@ namespace Node.Domain
 
                 foreach (var bl in forkedBlocks)
                 {
-                    RevalidateBlockOnSync(bl);
+                    RevalidateBlock(bl);
                     BlockChain.TryAdd(bl.Index, bl);
                 }
 
@@ -277,7 +283,7 @@ namespace Node.Domain
             }
             else
             {
-                RevalidateBlockOnSync(minedBlock);
+                RevalidateBlock(minedBlock);
 
                 // remove mined transactions from pending transactions
                 List<string> minedTxIds = minedBlock.Transactions.Select(t => t.TransactionHash).ToList();
@@ -287,7 +293,7 @@ namespace Node.Domain
             }
         }
 
-        private void RevalidateBlockOnSync(Block b)
+        private void RevalidateBlock(Block b)
         {
             if (!b.IsDataValid())
                 throw new ArgumentException($"Block datac changed by middle man.Index={b.Index}");
