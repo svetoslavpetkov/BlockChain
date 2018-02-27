@@ -81,7 +81,7 @@ namespace Wallet.UI
 
                 if (result)
                 {
-                    Output.WriteSuccess("Money send to blockchain");
+                    Output.WriteSuccess($"Success tx: {transaction.TransactionHash}");
                 }
                 else
                 {
