@@ -37,7 +37,7 @@
             Block {{ block.index }}
           </div>
           <div class="card-body">
-            <p>Mined by <router-link :to="{ name: 'account', params: { id: block.minedBy }}">{{ block.minedBy }}</router-link></p>
+            <p>Mined by <router-link :to="{ name: 'account', params: { address: block.minedBy }}">{{ block.minedBy }}</router-link></p>
             <p>{{ block.transactionsCount }} transactions</p>
             <p>Block reward {{ block.blockReward }}</p>
           </div>
@@ -57,10 +57,10 @@
           <div class="card-body">
             <div class="row">
               <div class="col">
-                From <router-link :to="{ name: 'miner', params: { minerId: transaction.fromAddress }}">{{ transaction.fromAddress }}</router-link>
+                From <router-link :to="{ name: 'account', params: { address: transaction.fromAddress }}">{{ transaction.fromAddress }}</router-link>
               </div>
               <div class="col">
-                To <router-link :to="{ name: 'miner', params: { minerId: transaction.fromAddress }}">{{ transaction.fromAddress }}</router-link>
+                To <router-link :to="{ name: 'account', params: { address: transaction.fromAddress }}">{{ transaction.fromAddress }}</router-link>
               </div>
             </div>
             <p>Amount {{ transaction.amountString }}</p>
