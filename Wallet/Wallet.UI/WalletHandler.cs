@@ -18,11 +18,19 @@ namespace Wallet.UI
                 Console.WriteLine($"**** Account  {i}");
                 Console.WriteLine($"PrivateKey: " + accounts[i].PrivateKey);
                 Console.WriteLine($"Address: " + accounts[i].Address);
+                try
+                {
+                    ulong ballance = blockChainClient.GetBalance(accounts[i].Address);
+                    totalBallance += ballance;
 
-                ulong ballance = blockChainClient.GetBalance(accounts[i].Address);
-                totalBallance += ballance;
-
-                Console.WriteLine($"Ballance: " + ballance.GetFormattedTokens());
+                    Console.WriteLine($"Ballance: " + ballance.GetFormattedTokens());
+                }
+                catch (Exception)
+                {
+                    Output.WriteError("Cannot retreive ballance, could not connect to node");
+                }
+                Console.WriteLine();
+                Console.WriteLine();
             }
         }
 

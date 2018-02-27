@@ -1,4 +1,5 @@
 ﻿using BlockChain.Core;
+using Node.Domain.Exceptions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -114,39 +115,54 @@ namespace Node.Domain
             ValidateTransaction(transaction);
 
             ulong senderBalance = CalculateBalance(transaction.FromAddress, true, true);
-            transaction.TranserSuccessfull = senderBalance >= transaction.Amount;
-
-            PendingTransactions.Add(transaction);
-
-            if (!transaction.TranserSuccessfull)
-                throw new BalanceNotEnoughException($"Address '{transaction.FromAddress}' trying to send {transaction.Amount.GetFormattedTokens()}, but balance is {senderBalance.GetFormattedTokens()}");
+            if (senderBalance >= transaction.Fee)
+            {
+                transaction.TranserSuccessfull = senderBalance >= transaction.Amount + transaction.Fee;
+                PendingTransactions.Add(transaction);
+                if (!transaction.TranserSuccessfull)
+                    throw new BalanceNotEnoughException($"Address '{transaction.FromAddress}' trying to send {transaction.Amount.GetFormattedTokens()}, but balance is {senderBalance.GetFormattedTokens()}. Transaction fee will be deducted !!!");
+            }
+            else
+            {
+                throw new BalanceNotEnoughException($"Address '{transaction.FromAddress}' does not have enough money even for paying the fee");
+            }
         }
 
+
+        private object _nonceFoundLock = new object();
         public void NonceFound(string minerAddress, int nonce, string hash)
         {
-            Block block = BlocksInProgress[minerAddress];
-            if (block == null)
-                return;
+            lock (_nonceFoundLock)
+            {
+                Block block = BlocksInProgress[minerAddress];
+                if (block == null)
+                    return;
 
-            if (!CryptoUtil.IsAddressValid(minerAddress))
-                throw new AddressNotValidException($"Miner address '{minerAddress}' is not valid");
+                if (!CryptoUtil.IsAddressValid(minerAddress))
+                    throw new AddressNotValidException($"Miner address '{minerAddress}' is not valid");
 
-            ValidateBlockHash(block, nonce, hash);
-            block.BlockMined(nonce, hash, minerAddress);
+                if (block.Index != BlockChain.Last().Key + 1)
+                {
+                    throw new NonceUselessException();
+                }
 
-            int minedTransactionsCount = block.Transactions.Count;
+                ValidateBlockHash(block, nonce, hash);
+                block.BlockMined(nonce, hash, minerAddress);
 
-            List<Transaction> notMinedTxs = new List<Transaction>();
-            var allTx = PendingTransactions.ToList();
+                int minedTransactionsCount = block.Transactions.Count;
 
-            for (int i = minedTransactionsCount; i < allTx.Count; i++)
-                notMinedTxs.Add(allTx[i]);
+                List<Transaction> notMinedTxs = new List<Transaction>();
+                var allTx = PendingTransactions.ToList();
 
-            PendingTransactions = new ConcurrentBag<Transaction>(notMinedTxs);
+                for (int i = minedTransactionsCount; i < allTx.Count; i++)
+                    notMinedTxs.Add(allTx[i]);
 
-            BlockChain.TryAdd(block.Index, block);
-            BlocksInProgress[minerAddress] = null;
-            NodeSynchornizator.BroadcastBlock(block);
+                PendingTransactions = new ConcurrentBag<Transaction>(notMinedTxs);
+
+                BlockChain.TryAdd(block.Index, block);
+                BlocksInProgress[minerAddress] = null;
+                NodeSynchornizator.BroadcastBlock(block);
+            }
         }
 
         private void ValidateBlockHash(Block block, int nonce, string hash)
