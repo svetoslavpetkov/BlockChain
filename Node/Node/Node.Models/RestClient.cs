@@ -44,19 +44,21 @@ namespace BlockChain.Core
         public TResult Get<TResult>(string methodPath)
         {
             Uri requestUri = new Uri(ApiUri, methodPath);
-
-            HttpResponseMessage response = Client.GetAsync(requestUri).GetAwaiter().GetResult();
+            string json = null;
             try
             {
+                HttpResponseMessage response = Client.GetAsync(requestUri).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
+                json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             }
             catch
             {
                 return default(TResult);
             }
-            string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-            return JsonConvert.DeserializeObject<TResult>(json);
+            if (json == null)
+                return default(TResult);
+            else
+                return JsonConvert.DeserializeObject<TResult>(json);
         }
 
         private StringContent ObjectToJsonContent(Object data)

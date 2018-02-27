@@ -59,6 +59,8 @@ namespace Node
                 app.UseDeveloperExceptionPage();
             }
 
+            app.ApplicationServices.GetService<Domain.Node>().Init();
+
             app.UseCors("CorsPolicy");
 
             app.UseMvc();

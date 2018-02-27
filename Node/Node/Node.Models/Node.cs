@@ -47,12 +47,23 @@ namespace Node.Domain
             CryptoUtil = cryptoUtil;
             ProofOfWork = proofOfWork;
 
+           
+
+          
+        }
+
+        public void Init()
+        {
+            Console.WriteLine("Creating genesis block...");
+
             Block genesisBlock = Block.CreateGenesisBlock(Difficulty);
             BlockChain.TryAdd(0, genesisBlock);
 
             Started = DateTime.Now;
 
-           var missedBlocks =  NodeSynchornizator.SyncBlocks();
+            Console.WriteLine("Node initializing...");
+
+            var missedBlocks = NodeSynchornizator.SyncBlocks();
 
             foreach (var b in missedBlocks)
             {

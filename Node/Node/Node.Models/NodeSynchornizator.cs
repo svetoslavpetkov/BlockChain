@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace Node.Domain
 {
@@ -20,7 +20,7 @@ namespace Node.Domain
     }
 
     public class NodeSynchornizator : INodeSynchornizator
-    {   
+    {
         private class NodeDetails
         {
             public string Name { get; set; }
@@ -50,7 +50,12 @@ namespace Node.Domain
                     PeerApiModel pm = new PeerApiModel() { Url = Current.Url, Name = Current.Name };
                     PeerApiModel foundNode = cl.Post<PeerApiModel, PeerApiModel>("api/peers/connect", pm);
                     if (foundNode != null)
-                        Peers.Add(new Peer(foundNode.Url,foundNode.Name));
+                    {
+                        Console.Write($"{Current.Url} found node:{foundNode.Name}/{foundNode.Url}");
+                        if (!IsPeerExists(foundNode.Url))
+                            Peers.Add(new Peer(foundNode.Url, foundNode.Name));
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -102,10 +107,19 @@ namespace Node.Domain
 
         public PeerApiModel AddNewlyConnectedPeer(PeerApiModel p)
         {
-            Peer peer = new Peer(p.Url, p.Name);
-            Peers.Add(peer);
+            if (!IsPeerExists(p.Url))
+            {
+                Peer peer = new Peer(p.Url, p.Name);
+                Peers.Add(peer);
+            }
 
             return PeerApiModel.FromPeer(Current);
+        }
+
+        private bool IsPeerExists(string url)
+        {
+            bool isExists = Peers.Any(x => x.Url == url);
+            return isExists;
         }
 
         public List<Block> GetBlocksForSync(string nodeAddress)
@@ -114,9 +128,9 @@ namespace Node.Domain
             var blockModels = client.Get<List<BlockSyncApiModel>>($"api/block");
             List<Block> blocks = new List<Block>();
 
-            if(blockModels.Count > 1)
-            for (int i = 1; i < blockModels.Count; i++)
-                blocks.Add(Block.ReCreateBlock(blockModels[i]));
+            if (blockModels.Count > 1)
+                for (int i = 1; i < blockModels.Count; i++)
+                    blocks.Add(Block.ReCreateBlock(blockModels[i]));
 
             return blocks;
         }
@@ -129,7 +143,7 @@ namespace Node.Domain
             {
                 try
                 {
-                   List<Block> peerBlock =  GetBlocksForSync(p.Url);
+                    List<Block> peerBlock = GetBlocksForSync(p.Url);
                     if (blocks.Count < peerBlock.Count)
                         blocks = peerBlock;
                 }
