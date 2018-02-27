@@ -25,3 +25,18 @@ div.app-container {
     color: green;
     font-weight: bold;
 }
+
+.transaction-pending {
+    color: orange;
+    font-weight: bold;
+}
+
+.transaction-approved {
+    color: green;
+    font-weight: bold;
+}
+
+.transaction-declined {
+    color: red;
+    font-weight: bold;
+}
