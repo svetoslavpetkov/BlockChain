@@ -1,0 +1,27 @@
+li.nav-item.active, li.nav-item:not(.active):hover {
+    border-bottom: 2px solid black;
+}
+
+body.main-container {
+    padding-top: 56px;
+}
+
+div.app-container {
+    margin-top: 12px;
+}
+
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.transaction-out {
+    color: red;
+    font-weight: bold;
+}
+
+.transaction-in {
+    color: green;
+    font-weight: bold;
+}
