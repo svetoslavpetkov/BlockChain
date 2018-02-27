@@ -71,7 +71,7 @@ namespace Node.Domain
                 BlockChain.TryAdd(b.Index, b);
             }
 
-            Console.WriteLine("Node initialized. Synced finished.");
+            Console.WriteLine($"Node initialized. Synced finished.Blocks count {BlockChain.Count}");
         }
 
         private void ValidateTransaction(Transaction transaction)
