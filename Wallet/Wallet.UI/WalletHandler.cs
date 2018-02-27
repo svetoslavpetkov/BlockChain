@@ -13,6 +13,7 @@ namespace Wallet.UI
         {
             var accounts = wallet.GetAccounts();
             ulong totalBallance = 0;
+            ulong totalUnconfirmedBallance = 0;
             for (int i = 0; i < accounts.Count; i++)
             {
                 Console.WriteLine($"**** Account  {i}");
@@ -23,6 +24,9 @@ namespace Wallet.UI
                     ulong ballance = blockChainClient.GetBalance(accounts[i].Address);
                     totalBallance += ballance;
 
+                    ulong unconfirmedBallance = blockChainClient.GetBalance(accounts[i].Address, true);
+                    totalUnconfirmedBallance += unconfirmedBallance;
+
                     Console.WriteLine($"Ballance: " + ballance.GetFormattedTokens());
                 }
                 catch (Exception)
@@ -31,6 +35,11 @@ namespace Wallet.UI
                 }
                 Console.WriteLine();
                 Console.WriteLine();
+            }
+            Console.WriteLine($"Total ballance: {totalBallance.GetFormattedTokens()}");
+            if (totalUnconfirmedBallance > 0)
+            {
+                Console.WriteLine($"Unconfirmed ballance: {totalUnconfirmedBallance.GetFormattedTokens()}");
             }
         }
 
