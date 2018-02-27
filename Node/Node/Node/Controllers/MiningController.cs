@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Node.Domain;
 using Node.Domain.ApiModels;
+using Node.Domain.Exceptions;
 
 namespace Node.Controllers
 {
@@ -30,8 +31,16 @@ namespace Node.Controllers
         [HttpPost("noncefound")]
         public IActionResult NonceFound([FromBody]BlockMinedApiModel blockMinedRequest)
         {
-            Node.NonceFound(blockMinedRequest.MinerAddress, blockMinedRequest.Nonce, blockMinedRequest.Hash);
-            return Ok();
+            try
+            {
+                Node.NonceFound(blockMinedRequest.MinerAddress, blockMinedRequest.Nonce, blockMinedRequest.Hash);
+                return Ok();
+            }
+            catch (NonceUselessException)
+            {
+                return BadRequest();
+            }
+
         }
     }
 }

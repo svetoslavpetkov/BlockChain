@@ -64,7 +64,7 @@ namespace Node.Domain
 
         public static Block CreateGenesisBlock(int difficulty)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = new DateTime(2018,1,1);
             Block genesis = new Block()
             {
                 Transactions = new List<Transaction>()
