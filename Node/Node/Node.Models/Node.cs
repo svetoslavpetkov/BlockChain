@@ -178,6 +178,11 @@ namespace Node.Domain
             return CalculateBalance(address, false, true);
         }
 
+        public ulong GetUnconfirmedBalance(string address)
+        {
+            return CalculateBalance(address, true, true);
+        }
+
         private ulong CalculateBalance(string address, bool includeUncomfirmed = false,
             bool onlySuccessful = false)
         {

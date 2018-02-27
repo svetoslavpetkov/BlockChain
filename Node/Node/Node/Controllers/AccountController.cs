@@ -22,6 +22,13 @@ namespace Node.Controllers
             return Ok(balance);
         }
 
+        [HttpGet("{address}/unconfirmed-balance")]
+        public IActionResult GetUnconfirmedBallance(string address)
+        {
+            ulong balance = Node.GetUnconfirmedBalance(address);
+            return Ok(balance);
+        }
+
         [HttpGet("{address}/latesttransactions/{count}")]
         public IActionResult GetTransactions(string address, int count)
         {
