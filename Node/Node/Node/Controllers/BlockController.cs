@@ -53,11 +53,18 @@ namespace Node.Controllers
             return NotFound($"Block with index {index} is not found");
         }
 
-        [HttpGet("last")]
-        public IActionResult GetLastBlock()
+        [HttpGet("last/{count}")]
+        public IActionResult GetLastBlock(int count)
         {
-            BlockApiModel lastBlock = BlockQuery.GetLastBlock();
+            List<BlockApiModel> lastBlock = BlockQuery.GetLastBlocks(count);
+            return Ok(lastBlock);
+        }
 
+
+        [HttpGet("all")]
+        public IActionResult GettAllBlocks()
+        {
+            List<BlockApiModel> lastBlock = BlockQuery.GetAllBlocks();
             return Ok(lastBlock);
         }
 

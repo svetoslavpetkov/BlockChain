@@ -1,6 +1,8 @@
 <template>
     <article>
+				<h2>Address details</h2>
         <div class="jumbotron">
+				
             <div class="row">
                 <div class="col-2">
                     <strong>Address</strong>
@@ -19,18 +21,17 @@
                     <table class="table table-striped">
                         <thead>
                             <tr class="d-inline-block col-12 text-truncate p-0">
-                                <th class="d-inline-block col-2 text-truncate">TX hash</th>
+                                <th class="d-inline-block col-3 text-truncate">TX hash</th>
                                 <th class="d-inline-block col-2 text-truncate">Date</th>
                                 <th class="d-inline-block col-2 text-truncate">From</th>
                                 <th class="d-inline-block col-1 text-truncate">Direction</th>
                                 <th class="d-inline-block col-2 text-truncate">To</th>
-                                <th class="d-inline-block col-1 text-truncate">Value</th>
-                                <th class="d-inline-block col-2 text-truncate">Comment</th>
+                                <th class="d-inline-block col-2 text-truncate">Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="transaction in transactions" :key="transaction.id">
-                                <td class="d-inline-block col-2 text-truncate">
+                                <td class="d-inline-block col-3 text-truncate">
                                     <router-link :to="{ name: 'transaction', params: { transactionHash: transaction.transactionHash } }">{{ transaction.transactionHash }}</router-link>
                                 </td>
                                 <td class="d-inline-block col-2 text-truncate">{{ transaction.dateCreated | dateTime('yyyy.MM.dd hh:mm:ss') }}</td>
@@ -43,8 +44,7 @@
                                 <td class="d-inline-block col-2 text-truncate">
                                     <router-link :to="{ name: 'account', params: { address: transaction.toAddress } }">{{ transaction.toAddress }}</router-link>
                                 </td>
-                                <td class="d-inline-block col-1 text-truncate">{{ transaction.amountString }}</td>
-                                <td class="d-inline-block col-2 text-truncate">{{ transaction.comment }}</td>
+                                <td class="d-inline-block col-2 text-truncate">{{ transaction.amountString }}</td>
                             </tr>
                         </tbody>
                     </table>

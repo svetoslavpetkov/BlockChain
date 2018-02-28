@@ -7,9 +7,10 @@ namespace Node.Domain
     {
         BlockApiModel Get(int index);
         List<BlockSyncApiModel> All();
-        BlockApiModel GetLastBlock();
+        List<BlockApiModel> GetLastBlocks(int count);
         List<BlockApiModel> GetBlocks(int fromIndex, int count);
         List<BlockSyncApiModel> GetBlocksForSync(int fromIndex, int count);
+        List<BlockApiModel> GetAllBlocks();
     }
 
     public class BlockQuery : IBlockQuery
@@ -53,11 +54,17 @@ namespace Node.Domain
             return blocks;
         }
 
-        public BlockApiModel GetLastBlock()
+        public List<BlockApiModel> GetLastBlocks(int count)
         {
-            BlockApiModel lastBlock = BlockApiModel.FromBlock(Node.LastBlock);
+            int startFrom = Node.BlockChain.Count - count;
 
-            return lastBlock;
+            if (startFrom < 0)
+                startFrom = 0;
+
+            List<Block> blocks = Node.BlockChain.Values.OrderByDescending(b => b.Index).Take(count).ToList();
+            List<BlockApiModel> result =  blocks.Select(b => BlockApiModel.FromBlock(b)).ToList();
+
+            return result;
         }
 
         public List<BlockApiModel> GetBlocks(int fromIndex, int count)
@@ -71,6 +78,14 @@ namespace Node.Domain
                 result.Add(BlockApiModel.FromBlock(Node.BlockChain[i]));
 
             result = result.OrderByDescending(b => b.Index).ToList();
+
+            return result;
+        }
+
+        public List<BlockApiModel> GetAllBlocks()
+        {
+            List<Block> blocks = Node.BlockChain.Values.OrderByDescending(b => b.Index).ToList();
+            List<BlockApiModel> result = blocks.Select(b => BlockApiModel.FromBlock(b)).ToList();
 
             return result;
         }

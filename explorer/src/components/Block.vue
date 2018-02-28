@@ -83,17 +83,16 @@
         <table class="table table-striped">
           <thead>
             <tr class="d-inline-block col-12 text-truncate">
-              <th class="d-inline-block col-2 text-truncate">TX hash</th>
+              <th class="d-inline-block col-4 text-truncate">TX hash</th>
               <th class="d-inline-block col-2 text-truncate">Date</th>
               <th class="d-inline-block col-2 text-truncate">From</th>
               <th class="d-inline-block col-2 text-truncate">To</th>
               <th class="d-inline-block col-2 text-truncate">Value</th>
-              <th class="d-inline-block col-2 text-truncate">Comment</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="transaction in transactions" :key="transaction.id">
-              <td class="d-inline-block col-2 text-truncate">
+              <td class="d-inline-block col-4 text-truncate">
                 <router-link :to="{ name: 'transaction', params: { transactionHash: transaction.transactionHash } }">{{ transaction.transactionHash }}</router-link>
               </td>
               <td class="d-inline-block col-2 text-truncate">{{ transaction.dateCreated | dateTime('yyyy.MM.dd hh:mm:ss') }}</td>
@@ -104,7 +103,6 @@
                 <router-link :to="{ name: 'account', params: { address: transaction.toAddress } }">{{ transaction.toAddress }}</router-link>
               </td>
               <td class="d-inline-block col-2 text-truncate">{{ transaction.amountString }}</td>
-              <td class="d-inline-block col-2 text-truncate">{{ transaction.comment }}</td>
             </tr>
           </tbody>
         </table>
