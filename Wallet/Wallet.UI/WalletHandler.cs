@@ -28,6 +28,7 @@ namespace Wallet.UI
                     totalUnconfirmedBallance += unconfirmedBallance;
 
                     Console.WriteLine($"Ballance: " + ballance.GetFormattedTokens());
+                    Console.WriteLine($"Unconfirmed: " + unconfirmedBallance.GetFormattedTokens());
                 }
                 catch (Exception)
                 {
@@ -39,7 +40,7 @@ namespace Wallet.UI
             Console.WriteLine($"Total ballance: {totalBallance.GetFormattedTokens()}");
             if (totalUnconfirmedBallance > 0)
             {
-                Console.WriteLine($"Unconfirmed ballance: {totalUnconfirmedBallance.GetFormattedTokens()}");
+                Console.WriteLine($"Total Unconfirmed ballance: {totalUnconfirmedBallance.GetFormattedTokens()}");
             }
         }
 
@@ -90,7 +91,7 @@ namespace Wallet.UI
             }
             catch (Exception ex)
             {
-                Output.WriteError(ex.Message);
+                Output.WriteError(ex.Message + $" transaction ID: {transaction.TransactionHash}");
             }
 
 

@@ -139,6 +139,11 @@ namespace Wallet.UI
 
             //tran = accounts[2].Sign("asfasdfasdfasdasfasddfdasasdffasdsd", 1000);
             //isValid = nodeSimulator.IsValid(tran);
+            if (args.Length > 0)
+            {
+                blockChainClient.NodeUrl = args[0];
+            }
+
             try
             {
                 while (true)

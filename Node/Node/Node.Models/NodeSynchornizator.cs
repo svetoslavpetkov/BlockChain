@@ -77,7 +77,7 @@ namespace Node.Domain
                 try
                 {
                     RestClient client = new RestClient(p.Url);
-                    client.Post("api/transaction/new", tx);
+                    client.Post("api/transaction/newfrompeer", tx);
                 }
                 catch (Exception) { }
             }

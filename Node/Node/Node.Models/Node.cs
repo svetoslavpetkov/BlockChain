@@ -68,7 +68,7 @@ namespace Node.Domain
             Console.WriteLine($"Node initialized. Synced finished.Blocks count {BlockChain.Count}");
         }
 
-        public void AddTransaction(Transaction transaction)
+        public void AddTransaction(Transaction transaction, bool broadcast = true)
         {
             ValidateTransaction(transaction);
 
@@ -77,6 +77,10 @@ namespace Node.Domain
             {
                 transaction.TranserSuccessfull = senderBalance >= transaction.Amount + transaction.Fee;
                 PendingTransactions.Add(transaction);
+                if (broadcast)
+                {
+                    NodeSynchornizator.BroadcastTransaction(transaction);
+                }
                 if (!transaction.TranserSuccessfull)
                     throw new BalanceNotEnoughException($"Address '{transaction.FromAddress}' trying to send {transaction.Amount.GetFormattedTokens()}, but balance is {senderBalance.GetFormattedTokens()}. Transaction fee will be deducted !!!");
             }

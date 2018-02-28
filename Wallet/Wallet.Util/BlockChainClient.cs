@@ -10,6 +10,7 @@ namespace Wallet.Util
 {
     public interface IBlockChainClient
     {
+        string NodeUrl { get; set; }
         ulong GetBalance(string address, bool includeUncofirmed = false);
         bool SendTransaction(Transaction transaction);
     }

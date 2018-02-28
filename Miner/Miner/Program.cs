@@ -13,7 +13,7 @@ namespace Miner
     class Program
     {
         private static readonly string defaultMinerAddress = "fb01e952e46e641ff3c74616541e292a0c11d455";
-        private static readonly string nodeAddress = "http://localhost:5555";
+        private static readonly string defaultNodeAddress = "http://localhost:5555";
         private static readonly TimeSpan timeLimit = new TimeSpan(0, 0, 5);
         private static readonly TimeSpan retryDelay = new TimeSpan(0, 0, 5);
 
@@ -22,6 +22,7 @@ namespace Miner
             IProofOfWork proofOfWork = new ProofOfWork();
             ICryptoUtil cryptoUtil = new CryptoUtil();
             string minerAddress = defaultMinerAddress;
+            string nodeAddress = defaultNodeAddress;
             if (args.Length > 0)
             {
                 if(cryptoUtil.IsAddressValid(args[0]))
@@ -34,7 +35,13 @@ namespace Miner
                 }
             }
 
-            Console.WriteLine($"Statring mining for {minerAddress}");
+            if (args.Length > 1)
+            {
+                nodeAddress = args[1];
+            }
+
+            Console.WriteLine($"Statring mining for address {minerAddress}");
+            Console.WriteLine($"Statring mining for node: {nodeAddress}");
 
             Stopwatch sw = Stopwatch.StartNew();
             BlockInput input = Get<BlockInput>(nodeAddress + "/api/mining/getBockForMine/" + minerAddress);

@@ -38,6 +38,26 @@ namespace Node.Controllers
 
         }
 
+        [HttpPost("newfrompeer")]
+        public IActionResult NewFromPeer([FromBody]Transaction transaction)
+        {
+            try
+            {
+                Node.AddTransaction(transaction, false);
+                return Ok();
+            }
+            catch (AddressNotValidException ex)
+            {
+                return BadRequest(new ResponseDetails { Error = ex.Message.ToString() });
+
+            }
+            catch (BalanceNotEnoughException ex)
+            {
+                return BadRequest(new ResponseDetails { Error = ex.Message.ToString() });
+            }
+
+        }
+
         [HttpGet("{tx}")]
         [ProducesResponseType(typeof(GetTransactionApiModel), 200)]
         public IActionResult Get(string tx)
