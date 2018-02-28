@@ -10,7 +10,7 @@ namespace Wallet.Util
 {
     public interface IBlockChainClient
     {
-        ulong GetBalance(string address);
+        ulong GetBalance(string address, bool includeUncofirmed = false);
         bool SendTransaction(Transaction transaction);
     }
 
@@ -18,10 +18,13 @@ namespace Wallet.Util
     {
         public string NodeUrl { get; set; } = "http://localhost:5555";
 
-        public ulong GetBalance(string address)
+        public ulong GetBalance(string address, bool includeUncofirmed = false)
         {
+            string url = includeUncofirmed
+                ? NodeUrl + $"/api/account/{address}/unconfirmed-balance"
+                : NodeUrl + $"/api/account/{address}/ballance";
             ulong balance = 0;
-            balance = Get<ulong>(NodeUrl +  $"/api/account/{address}/ballance");
+            balance = Get<ulong>(url);
 
             return balance;
         }

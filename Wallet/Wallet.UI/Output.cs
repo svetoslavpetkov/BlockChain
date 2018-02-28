@@ -18,7 +18,7 @@ namespace Wallet.UI
 
         public static void WriteSuccess(string message)
         {
-            Write(message, ConsoleColor.Green, ConsoleColor.White);
+            Write(message, ConsoleColor.Green, ConsoleColor.Black);
         }
 
 
