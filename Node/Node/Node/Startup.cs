@@ -41,6 +41,8 @@ namespace Node
             services.AddSingleton<Domain.ITransactionQuery, Domain.TransactionQuery>();
             services.AddSingleton<Domain.IInfoQuery, Domain.InfoQuery>();
             services.AddSingleton<Domain.IBlockQuery, Domain.BlockQuery>();
+            services.AddSingleton<Domain.IAddressQuery, Domain.AddressQuery>();
+            services.AddSingleton<Domain.IMineQuery, Domain.MineQuery>();
 
             services.AddSingleton<Domain.INodeSynchornizator>(s =>
             {

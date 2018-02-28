@@ -64,8 +64,11 @@ namespace Node.Controllers
         [HttpGet("getblocksByFromIndexAndCount/{fromIndex}/{count}")]
         public IActionResult GetBlocks(int fromIndex, int count)
         {
-            if (fromIndex < 0 || count < 0)
-                return BadRequest("'formIndex' and 'count' must be positive.");
+            if ( count < 0)
+                return BadRequest("'count' must be positive.");
+
+            if (fromIndex < 0)
+                fromIndex = 0;
 
             List<BlockApiModel> result = BlockQuery.GetBlocks(fromIndex, count);
 

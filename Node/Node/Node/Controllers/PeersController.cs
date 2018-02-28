@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Node.Domain;
-using Node.Domain.ApiModels;
 
 namespace Node.Controllers
 {

@@ -15,15 +15,18 @@ namespace Node.Controllers
     public class MiningController : Controller
     {
         private Domain.Node Node { get; set; }
-        public MiningController(Domain.Node node)
+        private IMineQuery MineQuery { get; set; }
+
+        public MiningController(Domain.Node node, IMineQuery mineQuery)
         {
             Node = node;
+            MineQuery = mineQuery;
         }
 
         [HttpGet("getBockForMine/{minerAddress}")]
         public IActionResult GetBlockForMine(string minerAddress)
         { 
-            MiningContext context = Node.GetBlockForMine(minerAddress);
+            MiningContext context = MineQuery.GetBlockForMine(minerAddress);
 
             return Ok(context);
         }
