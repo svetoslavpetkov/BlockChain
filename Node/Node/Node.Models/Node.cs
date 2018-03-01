@@ -237,17 +237,18 @@ namespace Node.Domain
           bool onlySuccessful = false)
         {
             //Get transaction balances
-            var addressTransactions = GetTransactions(address, includeUncomfirmed, onlySuccessful);
+            var addressTransactions = GetTransactions(address, includeUncomfirmed, false);
             ulong balance = 0;
             foreach (var tx in addressTransactions)
             {
+                //we always deduct the Fee nomatter success or not
                 if (tx.FromAddress == address)
-                {
-                    balance -= tx.Amount;
                     balance -= tx.Fee;
-                }
 
-                if (tx.ToAddress == address)
+                if (tx.TranserSuccessfull && tx.FromAddress == address)
+                    balance -= tx.Amount;                
+
+                if (tx.TranserSuccessfull && tx.ToAddress == address)
                     balance += tx.Amount;
             }
 
