@@ -27,20 +27,21 @@ namespace Wallet.UI
                     ulong unconfirmedBallance = blockChainClient.GetBalance(accounts[i].Address, true);
                     totalUnconfirmedBallance += unconfirmedBallance;
 
-                    Console.WriteLine($"Ballance: " + ballance.GetFormattedTokens());
-                    Console.WriteLine($"Unconfirmed: " + unconfirmedBallance.GetFormattedTokens());
+                    Console.WriteLine($"Balance: " + ballance.GetFormattedTokens());
+                    if(ballance != unconfirmedBallance)
+                        Console.WriteLine($"Unconfirmed: " + unconfirmedBallance.GetFormattedTokens());
                 }
                 catch (Exception)
                 {
-                    Output.WriteError("Cannot retreive ballance, could not connect to node");
+                    Output.WriteError("Cannot retreive balance, could not connect to node");
                 }
                 Console.WriteLine();
                 Console.WriteLine();
             }
-            Console.WriteLine($"Total ballance: {totalBallance.GetFormattedTokens()}");
-            if (totalUnconfirmedBallance > 0)
+            Console.WriteLine($"Total balance: {totalBallance.GetFormattedTokens()}");
+            if (totalUnconfirmedBallance > 0 && totalUnconfirmedBallance != totalBallance)
             {
-                Console.WriteLine($"Total Unconfirmed ballance: {totalUnconfirmedBallance.GetFormattedTokens()}");
+                Console.WriteLine($"Total Unconfirmed balance: {totalUnconfirmedBallance.GetFormattedTokens()}");
             }
         }
 
